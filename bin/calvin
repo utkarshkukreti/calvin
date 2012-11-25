@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'calvin'
+
+Calvin::CLI.new ARGV
