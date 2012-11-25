@@ -83,6 +83,48 @@ module Calvin
       rule expression: subtree(:expression) do
         expression
       end
+
+      rule mapped: { monad: { left: { comparison_operator: simple(:op) },
+        integer: simple(:integer) }, mapper: simple(:mapper), expression: subtree(:expression) } do
+        if mapper == "@"
+        else
+          raise Core::ImpossibleException
+        end
+
+        op = op().to_sym # hack; make it a var
+        if op == :"<>"
+          op = :!=
+        elsif op == :"="
+          op = :"=="
+        end
+
+        if expression.is_a?(Array) || expression.is_a?(Range)
+          expression.to_a.select {|el| el.send(op, integer.to_i) }
+        else
+          expression.send(op, integer.to_i)
+        end
+      end
+
+      rule mapped: { monad: { right: { comparison_operator: simple(:op) },
+        integer: simple(:integer) }, mapper: simple(:mapper), expression: subtree(:expression) } do
+        if mapper == "@"
+        else
+          raise Core::ImpossibleException
+        end
+
+        op = op().to_sym # hack; make it a var
+        if op == :"<>"
+          op = :!=
+        elsif op == :"="
+          op = :"=="
+        end
+
+        if expression.is_a?(Array) || expression.is_a?(Range)
+          expression.to_a.select {|el| integer.to_i.send(op, el) }
+        else
+          expression.send(op, integer.to_i)
+        end
+      end
     end
   end
 end

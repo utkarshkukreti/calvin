@@ -14,15 +14,18 @@ module Calvin
     rule(:array) { (variable >> (space >> variable).repeat).as(:array) }
 
     rule(:range) { (integer.as(:first).maybe >> str("..") >> integer.as(:last)).as(:range) }
-    {mapper: Core::Mappers, folder: Core::Folders, binary_operator: Core::BinaryOperators }.each do |type, hash|
+    { mapper: Core::Mappers,
+      folder: Core::Folders,
+      binary_operator: Core::BinaryOperators,
+      comparison_operator: Core::ComparisonOperators }.each do |type, hash|
       rule type do
         hash.keys.map { |key| str(key).as(type) }.reduce(:|)
       end
     end
 
     rule :monad do
-      (variable >> binary_operator.as(:right) |
-        binary_operator.as(:left) >> variable).as(:monad)
+      (variable >> (binary_operator | comparison_operator).as(:right) |
+        (binary_operator | comparison_operator).as(:left) >> variable).as(:monad)
     end
 
     rule(:folded) { (binary_operator >> folder >> expression).as(:folded) }

@@ -39,6 +39,20 @@ describe Calvin::Evaluator do
     eval1("2^@1 2 3").should eq [2, 4, 8]
   end
 
+  it "should parse filter" do
+    eval1(">3@1 2 4").should eq [4]
+    eval1("<3@1 6 1").should eq [1, 1]
+    eval1(">=3@1 3 4").should eq [3, 4]
+    eval1("<=3@1 3 4").should eq [1, 3]
+    eval1("=3@1 2 3 3 4").should eq [3, 3]
+
+    eval1("3>@1 2 4").should eq [1, 2]
+    eval1("3<@1 6 1").should eq [6]
+    eval1("3>=@1 3 4").should eq [1, 3]
+    eval1("3<=@1 3 4").should eq [3, 4]
+    eval1("3=@1 2 3 3 4").should eq [3, 3]
+  end
+
   it "should parse nested expressions" do
     eval1("+\\2^@1 2 3").should eq 14
     eval1("-\\:-2@1 2 3").should eq 2
