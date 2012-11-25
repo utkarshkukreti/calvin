@@ -6,6 +6,10 @@ RSpec.configure do |config|
     Calvin::AST.new(input).ast
   end
 
+  def aste(input)
+    ast(input)[0][:expression]
+  end
+
   def eval(input)
     Calvin::Evaluator.new.apply ast(input)
   end

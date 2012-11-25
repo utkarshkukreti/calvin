@@ -1,25 +1,26 @@
 module Calvin
   class Evaluator < Parslet::Transform
-    rule folded: { binary_operator: simple(:op), folder: simple(:folder), array: sequence(:array) } do
+    rule folded: { binary_operator: simple(:op), folder: simple(:folder),
+      expression: sequence(:expression) } do
       if folder == "\\"
       elsif folder == "\\."
-        array.reverse!
+        expression.reverse!
       else
         raise Core::ImpossibleException
       end
 
       case op.to_sym
       when :+, :-, :%, :*, :/
-        array.reduce op.to_sym
+        expression.reduce op.to_sym
       when :^
-        array.reduce :**
+        expression.reduce :**
       else
         raise Core::ImpossibleException
       end
     end
 
     rule mapped: { monad: { left: { binary_operator: simple(:op) },
-      integer: simple(:integer) }, mapper: simple(:mapper), array: sequence(:array) } do
+      integer: simple(:integer) }, mapper: simple(:mapper), expression: sequence(:expression) } do
       if mapper == "@"
       else
         raise Core::ImpossibleException
@@ -30,11 +31,11 @@ module Calvin
         op = :**
       end
 
-      array.map {|el| el.send(op, integer.to_i) }
+      expression.map {|el| el.send(op, integer.to_i) }
     end
 
     rule mapped: { monad: { right: { binary_operator: simple(:op) },
-      integer: simple(:integer) }, mapper: simple(:mapper), array: sequence(:array) } do
+      integer: simple(:integer) }, mapper: simple(:mapper), expression: sequence(:expression) } do
       if mapper == "@"
       else
         raise Core::ImpossibleException
@@ -45,7 +46,11 @@ module Calvin
         op = :**
       end
 
-      array.map {|el| integer.to_i.send(op, el) }
+      expression.map {|el| integer.to_i.send(op, el) }
+    end
+
+    rule expression: subtree(:expression) do
+      expression
     end
   end
 end

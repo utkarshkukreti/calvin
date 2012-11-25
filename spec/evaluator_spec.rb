@@ -38,4 +38,10 @@ describe Calvin::Evaluator do
     eval1("^2@1 2 3").should eq [1, 4, 9]
     eval1("2^@1 2 3").should eq [2, 4, 8]
   end
+
+  it "should parse nested expressions" do
+    eval1("+\\2^@1 2 3").should eq 14
+    eval1("-\\.-2@1 2 3").should eq 2
+    eval1("/2@^2@2+@1 2 3").should eq [4, 8, 12]
+  end
 end

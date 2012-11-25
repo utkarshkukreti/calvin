@@ -19,10 +19,11 @@ module Calvin
         binary_operator.as(:left) >> integer).as(:monad)
     end
 
-    rule(:folded) { (binary_operator >> folder >> array).as(:folded) }
-    rule(:mapped) { (monad >> mapper >> array).as(:mapped) }
+    rule(:folded) { (binary_operator >> folder >> expression).as(:folded) }
+    rule(:mapped) { (monad >> mapper >> expression).as(:mapped) }
 
-    rule(:statement) { mapped | folded | array }
+    rule(:expression) { (mapped | folded | array).as(:expression) }
+    rule(:statement) { expression }
     rule(:statements) { statement.repeat }
 
     root(:statements)
