@@ -1,7 +1,10 @@
 module Calvin
   class CLI
     def initialize(argv)
-      # ignore argv, for now
+      if argv.any?
+        puts "Argument passed: #{argv.inspect}"
+      end
+      @verbose = argv.include?("--verbose")
       repl
     end
 
@@ -21,6 +24,12 @@ module Calvin
 
         begin
           ast = AST.new(line).ast
+
+          if @verbose
+            puts  "      AST: #{ast.inspect}"
+            print "Evaluated: "
+          end
+
           p Evaluator.new.apply(ast)[0]
         rescue Exception => e
           puts e
