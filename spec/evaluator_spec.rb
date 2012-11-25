@@ -51,4 +51,8 @@ describe Calvin::Evaluator do
     eval1("+\\1..100").should eq (100 * 101) / 2
     eval1("+\\..100").should eq (99 * 100) / 2
   end
+
+  it "should apply monads to single element too" do
+    eval1("*2@+\\1 2 3").should eq 12
+  end
 end
