@@ -4,9 +4,14 @@ module Calvin
     rule(:spaces?) { space.repeat }
     rule(:spaces) { space.repeat(1) }
     rule(:digit) { match["0-9"] }
-    rule(:integer) { digit.repeat(1).as(:integer) }
 
-    rule(:array) { (integer >> (space >> integer).repeat).as(:array) }
+    rule(:integer) { digit.repeat(1).as(:integer) }
+    rule(:constant) { integer }
+    rule(:identifier) { match["a-z"].repeat(1).as(:identifier) }
+    rule(:deassignment) { identifier.as(:deassignment) }
+    rule(:variable) { constant }
+
+    rule(:array) { (variable >> (space >> variable).repeat).as(:array) }
 
     rule(:range) { (integer.as(:first).maybe >> str("..") >> integer.as(:last)).as(:range) }
     {mapper: Core::Mappers, folder: Core::Folders, binary_operator: Core::BinaryOperators }.each do |type, hash|
@@ -16,15 +21,17 @@ module Calvin
     end
 
     rule :monad do
-      (integer >> binary_operator.as(:right) |
-        binary_operator.as(:left) >> integer).as(:monad)
+      (variable >> binary_operator.as(:right) |
+        binary_operator.as(:left) >> variable).as(:monad)
     end
 
     rule(:folded) { (binary_operator >> folder >> expression).as(:folded) }
     rule(:mapped) { (monad >> mapper >> expression).as(:mapped) }
 
-    rule(:expression) { (mapped | folded | range | array).as(:expression) }
-    rule(:statement) { expression }
+    rule(:assignment) { (identifier >> str(":=") >> expression).as(:assignment) }
+
+    rule(:expression) { (deassignment | mapped | folded | range | array).as(:expression) }
+    rule(:statement) { assignment | expression }
     rule(:statements) { statement.repeat }
 
     root(:statements)

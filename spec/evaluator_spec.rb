@@ -55,4 +55,18 @@ describe Calvin::Evaluator do
   it "should apply monads to single element too" do
     eval1("*2@+\\1 2 3").should eq 12
   end
+
+  it "should save assigned variables in env" do
+    e = Calvin::Evaluator.new
+
+    e.apply ast("a:=1")
+    e.env["a"].should eq [1]
+    e.apply(ast("a")[0]).should eq [1]
+
+    e.apply ast("a:=1 2 4")
+    e.apply(ast("a")[0]).should eq [1, 2, 4]
+
+    e.apply ast("b:=+\\4..6")
+    e.apply(ast("b")[0]).should eq 15
+  end
 end

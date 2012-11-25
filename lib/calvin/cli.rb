@@ -9,6 +9,7 @@ module Calvin
     end
 
     def repl
+      evaluator = Evaluator.new
       require 'readline'
 
       puts "Calvin Programming Language REPL."
@@ -30,7 +31,7 @@ module Calvin
             print "Evaluated: "
           end
 
-          p Evaluator.new.apply(ast)[0]
+          p evaluator.apply(ast)[0]
         rescue Exception => e
           puts e
           p e.message
