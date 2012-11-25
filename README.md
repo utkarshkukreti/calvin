@@ -1,4 +1,4 @@
-# Calvin
+# Calvin [![Build Status](https://travis-ci.org/utkarshkukreti/calvin.png)](https://travis-ci.org/utkarshkukreti/calvin)
 
 Calvin is a very terse programming language, inspired by APL/J/K.
 
