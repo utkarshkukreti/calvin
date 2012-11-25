@@ -1,5 +1,7 @@
-require "calvin/version"
+require "parslet"
+require "docopt"
 
-module Calvin
-  # Your code goes here...
-end
+require "calvin/parser"
+require "calvin/transform"
+require "calvin/ast"
+require "calvin/version"
