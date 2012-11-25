@@ -14,9 +14,15 @@ module Calvin
       end
     end
 
-    rule(:folded) { (binary_operator >> folder >> array).as(:folded) }
+    rule :monad do
+      (integer >> binary_operator.as(:right) |
+        binary_operator.as(:left) >> integer).as(:monad)
+    end
 
-    rule(:statement) { array | folded }
+    rule(:folded) { (binary_operator >> folder >> array).as(:folded) }
+    rule(:mapped) { (monad >> mapper >> array).as(:mapped) }
+
+    rule(:statement) { mapped | folded | array }
     rule(:statements) { statement.repeat }
 
     root(:statements)

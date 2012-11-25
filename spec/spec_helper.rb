@@ -9,4 +9,8 @@ RSpec.configure do |config|
   def eval(input)
     Calvin::Evaluator.new.apply ast(input)
   end
+
+  def eval1(input)
+    eval(input).first
+  end
 end
