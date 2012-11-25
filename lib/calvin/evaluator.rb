@@ -54,8 +54,8 @@ module Calvin
           op = :**
         end
 
-        if expression.is_a?(Array)
-          expression.map {|el| el.send(op, integer.to_i) }
+        if expression.is_a?(Array) || expression.is_a?(Range)
+          expression.to_a.map {|el| el.send(op, integer.to_i) }
         else
           expression.send(op, integer.to_i)
         end
@@ -73,8 +73,8 @@ module Calvin
           op = :**
         end
 
-        if expression.is_a?(Array)
-          expression.map {|el| integer.to_i.send(op, el) }
+        if expression.is_a?(Array) || expression.is_a?(Range)
+          expression.to_a.map {|el| integer.to_i.send(op, el) }
         else
           integer.to_i.send(op, expression)
         end
