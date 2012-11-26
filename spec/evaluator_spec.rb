@@ -175,6 +175,11 @@ describe Calvin::Evaluator do
       expect { eval1("5..-5") }.to raise_exception
       expect { eval1("..-5") }.to raise_exception
     end
+
+    it "should treat ranges as arrays when required" do
+      eval1("1..4 + 5 6 7 8 - 2..5").should eq [4, 5, 6, 7]
+      eval1("..100 - ..100").should eq [0] * 100
+    end
   end
 
 #   it "should parse foldl" do

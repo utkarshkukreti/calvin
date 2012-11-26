@@ -71,6 +71,7 @@ module Calvin
       extend self
 
       def apply(fn, object)
+        object = object.to_a if object.respond_to?(:to_a)
         if object.is_a?(Array)
           object.map { |el| apply(fn, el) }
         else
@@ -94,6 +95,9 @@ module Calvin
       end
 
       def apply_each(fn, left, right)
+        left  = left.to_a  if left.respond_to?(:to_a)
+        right = right.to_a if right.respond_to?(:to_a)
+
         if left.is_a?(Array) && right.is_a?(Array)
           if left.size == right.size
             left.zip(right).map do |l, r|
