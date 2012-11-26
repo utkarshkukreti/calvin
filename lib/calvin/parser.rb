@@ -40,7 +40,7 @@ module Calvin
     # dyad form
     rule :dyad do
       Verbs.map do |verb|
-        noun.as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
+        (pword | noun).as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
           (verb[:space] ? spaces : spaces?) >> word.as(:right)
       end.reduce(:|).as(:dyad)
     end
@@ -53,7 +53,8 @@ module Calvin
       end.reduce(:|).as(:monad)
     end
 
-    rule(:word) { dyad | monad | table | list | atom }
+    rule(:word) { dyad | monad | table | list | atom | (pword >> word.maybe).as(:parentheses) }
+    rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
     rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
     rule(:sentences) { sentence.repeat }
