@@ -59,6 +59,20 @@ describe Calvin::Evaluator do
       eval1("-1 - 2 3").should eq [-3, -4]
       eval1("2 3 - -2").should eq [4, 5]
     end
+
+    it "should evaluate multiply(`*`) dyad" do
+      eval1("1 * 2 3").should eq [2, 3]
+      eval1("2 3 * 2").should eq [4, 6]
+      eval1("-1 * 2 3").should eq [-2, -3]
+      eval1("2 3 * -2").should eq [-4, -6]
+    end
+
+    it "should evaluate divide(`/`) dyad" do
+      eval1("1.0 / 2 4").should eq [0.5, 0.25]
+      eval1("2 4 / 2").should eq [1, 2]
+      eval1("-1.0 / 2 4").should eq [-0.5, -0.25]
+      eval1("2 3 / -1").should eq [-2, -3]
+    end
   end
 #   it "should parse foldl" do
 #     eval1("+\\1 2 3").should eq 6
