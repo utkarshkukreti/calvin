@@ -36,9 +36,21 @@ describe Calvin::AST do
   end
 
   describe "Dyads" do
-    it "should parse simple dyads" do
+    it "should parse single dyads" do
       ast1("1 + 1").should eq dyad: { left: 1, symbol: "+", right: 1 }
       ast1("1 ^1").should eq dyad: { left: 1, symbol: "^", right: 1 }
+    end
+
+  end
+
+  describe "Sentences" do
+    it "should parse double dyads/monads sentence" do
+      ast1("1 2 + 3 4").should eq dyad: { left: { list: [1, 2] },
+                                          symbol: "+", right: { list: [3, 4] } }
+      ast1("1 2 + 3").should eq dyad: { left: { list: [1, 2] },
+                                        symbol: "+", right: 3 }
+      ast1("[1 2, 3 4] + 1").should eq dyad: { left: { table: [ {list: [1, 2] },
+                                    { list: [3, 4] }] }, symbol: "+", right: 1 }
     end
   end
 end

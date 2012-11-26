@@ -20,6 +20,8 @@ module Calvin
     rule(:table) { (str("[") >> list >> (str(",") >> spaces? >> list).repeat >>
                     str("]")).as(:table) }
 
+    rule(:noun) { (table | list | atom).as(:noun) }
+
     # Rank: 0 = atom, 1 = list, 2 = table, ...
     #                L, M, R
     verb symbol: :+, ranks: [0, 0, 0]
@@ -32,20 +34,15 @@ module Calvin
     # dyad form
     rule :dyad do
       Verbs.map do |verb|
-        left  = [atom, list, table][verb[:ranks][0]]
-        right = [atom, list, table][verb[:ranks][2]]
-
-        left.as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
-          spaces? >> right.as(:right)
+        noun.as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
+          spaces? >> noun.as(:right)
       end.reduce(:|).as(:dyad)
     end
 
     # monad form
     rule :monad do
       Verbs.map do |verb|
-        expression = [atom, list, table][verb[:ranks][1]]
-
-        str(verb[:symbol]).as(:symbol) >> spaces? >> expression.as(:expression)
+        str(verb[:symbol]).as(:symbol) >> spaces? >> noun.as(:expression)
       end.reduce(:|).as(:monad)
     end
 
