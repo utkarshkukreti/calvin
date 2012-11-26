@@ -1,42 +1,53 @@
 module Calvin
   class Parser < Parslet::Parser
-    rule(:space) { str(" ") }
-    rule(:spaces?) { space.repeat }
-    rule(:spaces) { space.repeat(1) }
+    Verbs = []
+
+    def self.verb(options)
+      Verbs << options
+    end
+
+    rule(:spaces) { str(" ").repeat(1) }
+    rule(:spaces?) { spaces.maybe }
     rule(:digit) { match["0-9"] }
 
     rule(:integer) { digit.repeat(1).as(:integer) }
-    rule(:constant) { integer }
-    rule(:identifier) { match["a-z"].repeat(1).as(:identifier) }
-    rule(:deassignment) { identifier.as(:deassignment) }
-    rule(:variable) { constant }
+    rule(:float) { (digit.repeat(1) >> str(".") >> digit.repeat(1)).as(:float) }
 
-    rule(:array) { (variable >> (space >> variable).repeat).as(:array) }
+    rule(:atom) { (float | integer).as(:atom) }
 
-    rule(:range) { (integer.as(:first).maybe >> str("..") >> integer.as(:last)).as(:range) }
-    { mapper: Core::Mappers,
-      folder: Core::Folders,
-      binary_operator: Core::BinaryOperators,
-      comparison_operator: Core::ComparisonOperators }.each do |type, hash|
-      rule type do
-        hash.keys.map { |key| str(key).as(type) }.reduce(:|)
-      end
+    rule(:list) { (atom >> (spaces >> atom).repeat(1)).as(:list) }
+
+    rule(:table) { (str("[") >> list >> (str(",") >> spaces? >> list).repeat >>
+                    str("]")).as(:table) }
+
+    # Rank: 0 = atom, 1 = list, 2 = table, ...
+    #                L, M, R
+    verb symbol: :+, ranks: [0, 0, 0]
+
+    # dyad form
+    rule :dyad do
+      Verbs.map do |verb|
+        left  = [atom, list, table][verb[:ranks][0]]
+        right = [atom, list, table][verb[:ranks][2]]
+
+        left.as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
+          spaces? >> right.as(:right)
+      end.reduce(:|).as(:dyad)
     end
 
+    # monad form
     rule :monad do
-      (variable >> (binary_operator | comparison_operator).as(:right) |
-        (binary_operator | comparison_operator).as(:left) >> variable).as(:monad)
+      Verbs.map do |verb|
+        expression = [atom, list, table][verb[:ranks][1]]
+
+        str(verb[:symbol]).as(:symbol) >> spaces? >> expression.as(:expression)
+      end.reduce(:|).as(:monad)
     end
 
-    rule(:folded) { (binary_operator >> folder >> expression).as(:folded) }
-    rule(:mapped) { (monad >> mapper >> expression).as(:mapped) }
+    rule(:sentence) { spaces? >> (dyad | monad | table | list | atom).as(:sentence) >> spaces? }
 
-    rule(:assignment) { (identifier >> str(":=") >> expression).as(:assignment) }
+    rule(:sentences) { sentence.repeat }
 
-    rule(:expression) { (deassignment | mapped | folded | range | array).as(:expression) }
-    rule(:statement) { assignment | expression }
-    rule(:statements) { statement.repeat }
-
-    root(:statements)
+    root(:sentences)
   end
 end

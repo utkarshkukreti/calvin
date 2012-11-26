@@ -7,6 +7,8 @@ require "calvin/transform"
 require "calvin/ast"
 require "calvin/evaluator"
 
+require "calvin/helpers"
+
 require "calvin/cli"
 
 require "calvin/version"
