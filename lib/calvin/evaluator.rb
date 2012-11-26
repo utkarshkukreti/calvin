@@ -15,15 +15,15 @@ module Calvin
           # Just return expression, for now.
           expression
         when :-
-          Evaluator::Helpers.negate expression
+          Evaluator::Helpers.apply lambda { |x| -x }, expression
         when :*
-          Evaluator::Helpers.sign expression
+          Evaluator::Helpers.apply lambda { |x| x <=> 0 },expression
         when :/
-          Evaluator::Helpers.reciprocal expression
+          Evaluator::Helpers.apply lambda { |x| 1 / x },expression
         when :^
-          Evaluator::Helpers.exponential expression
+          Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
         when :%
-          Evaluator::Helpers.magnitude expression
+          Evaluator::Helpers.apply lambda { |x| x.abs },expression
         end
       end
     end
@@ -32,43 +32,11 @@ module Calvin
     module Helpers
       extend self
 
-      def negate(object)
+      def apply(fn, object)
         if object.is_a?(Array)
-          object.map(&method(:negate))
+          object.map { |el| apply(fn, el) }
         else
-          - object
-        end
-      end
-
-      def sign(object)
-        if object.is_a?(Array)
-          object.map(&method(:sign))
-        else
-          object <=> 0
-        end
-      end
-
-      def reciprocal(object)
-        if object.is_a?(Array)
-          object.map(&method(:reciprocal))
-        else
-          1 / object
-        end
-      end
-
-      def exponential(object)
-        if object.is_a?(Array)
-          object.map(&method(:exponential))
-        else
-          Math::E ** object
-        end
-      end
-
-      def magnitude(object)
-        if object.is_a?(Array)
-          object.map(&method(:magnitude))
-        else
-          object.abs
+          fn.call object
         end
       end
     end
