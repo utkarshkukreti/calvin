@@ -47,6 +47,26 @@ describe Calvin::Evaluator do
       eval1("0 1 1 0 = 0").should eq [true, false, false, true]
       eval1("0 -1 1 = -1").should eq [false, true, false]
     end
+
+    it "should evaluate not equals(`<>`) dyad" do
+      eval1("1 <> 2 2 1").should eq [true, true, false]
+    end
+
+    it "should evaluate less than(`<`) dyad" do
+      eval1("1 < 1 2 4").should eq [false, true, true]
+    end
+
+    it "should evaluate less than or equal to(`<=`) dyad" do
+      eval1("1 <= 1 2 3").should eq [true, true, true]
+    end
+
+    it "should evaluate greater than(`>`) dyad" do
+      eval1("1 > 2 1 4").should eq [false, false, false]
+    end
+
+    it "should evaluate greater than or equal to(`>=`) dyad" do
+      eval1("1 >= 1 2 4").should eq [true, false, false]
+    end
   end
 
   describe "should evaluate dyads with 2 arrays" do
@@ -80,11 +100,30 @@ describe Calvin::Evaluator do
       eval1("2 5 % 2 7").should eq [0, 5]
     end
 
-
     it "should evaluate equals(`=`) dyad" do
       eval1("1 1 1 1 = 0 1 1 0").should eq [false, true, true, false]
       eval1("0 1 1 0 = 0 1 0 0").should eq [true, true, false, true]
       eval1("0 -1 1 = -1 0 1").should eq [false, false, true]
+    end
+
+    it "should evaluate not equals(`<>`) dyad" do
+      eval1("1 2 1 <> 2 2 1").should eq [true, false, false]
+    end
+
+    it "should evaluate less than(`<`) dyad" do
+      eval1("1 2 3 < 1 2 4").should eq [false, false, true]
+    end
+
+    it "should evaluate less than or equal to(`<=`) dyad" do
+      eval1("1 2 3 <= 1 2 3").should eq [true, true, true]
+    end
+
+    it "should evaluate greater than(`>`) dyad" do
+      eval1("1 2 3 > 2 1 4").should eq [false, true, false]
+    end
+
+    it "should evaluate greater than or equal to(`>=`) dyad" do
+      eval1("1 2 3 >= 1 2 4").should eq [true, true, false]
     end
   end
 

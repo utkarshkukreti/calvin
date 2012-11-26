@@ -40,6 +40,11 @@ module Calvin
     verb symbol: :%, ranks: [0, 0, 0]
 
     verb symbol: "="
+    verb symbol: "<>"
+    verb symbol: :<=
+    verb symbol: :<
+    verb symbol: :>=
+    verb symbol: :>
 
     # dyad form
     rule :dyad do

@@ -32,7 +32,7 @@ module Calvin
         expression = monad[:expression]
 
         case symbol
-        when :+, :"="
+        when :+, :"=", :"<>", :<, :<=, :>, :>=
           # Just return expression, for now.
           expression
         when :-
@@ -60,6 +60,10 @@ module Calvin
           Evaluator::Helpers.apply_dyad :**, left, right
         when :"="
           Evaluator::Helpers.apply_dyad :"==", left, right
+        when :"<>"
+          Evaluator::Helpers.apply_dyad :"!=", left, right
+        when :<, :<=, :>, :>=
+          Evaluator::Helpers.apply_dyad symbol, left, right
         end
       end
     end
