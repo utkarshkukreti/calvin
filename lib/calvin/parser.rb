@@ -10,8 +10,8 @@ module Calvin
     rule(:spaces?) { spaces.maybe }
     rule(:digit) { match["0-9"] }
 
-    rule(:integer) { digit.repeat(1).as(:integer) }
-    rule(:float) { (digit.repeat(1) >> str(".") >> digit.repeat(1)).as(:float) }
+    rule(:integer) { (str("-").maybe >> digit.repeat(1)).as(:integer) }
+    rule(:float) { (str("-").maybe >> digit.repeat(1) >> str(".") >> digit.repeat(1)).as(:float) }
 
     rule(:atom) { (float | integer).as(:atom) }
 

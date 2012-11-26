@@ -1,6 +1,26 @@
 require "spec_helper"
 
-# describe Calvin::Evaluator do
+describe Calvin::Evaluator do
+  describe "should evaluate monads" do
+    it "should evaluate negate (`-`) monad" do
+      eval1("-1").should eq -1
+      eval1("-0").should eq 0
+      eval1("-1.1").should eq -1.1
+      eval1("-0.0").should eq 0.0
+      eval1("- 1 -3 5").should eq [-1, 3, -5]
+      eval1("-[9 8, 7 -6 5]").should eq [[-9, -8], [-7, 6, -5]]
+    end
+
+    it "should evaluate sign (`*`) monad" do
+      eval1("*1").should eq 1
+      eval1("*0").should eq 0
+      eval1("*1.1").should eq 1
+      eval1("*0.0").should eq 0
+      eval1("* 1 -3 5").should eq [1, -1, 1]
+      eval1("*[9 8, 7 -6 0]").should eq [[1, 1], [1, -1, 0]]
+    end
+  end
+
 #   it "should parse foldl" do
 #     eval1("+\\1 2 3").should eq 6
 #     eval1("-\\1 2 3").should eq -4
@@ -88,4 +108,4 @@ require "spec_helper"
 #     e.apply ast("b:=+\\4..6")
 #     e.apply(ast("b")[0]).should eq 15
 #   end
-# end
+end
