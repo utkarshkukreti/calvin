@@ -25,7 +25,7 @@ module Calvin
     # Rank: 0 = atom, 1 = list, 2 = table, ...
     #                L, M, R
     verb symbol: :+, ranks: [0, 0, 0]
-    verb symbol: :-, ranks: [0, 0, 0]
+    verb symbol: :-, ranks: [0, 0, 0], space: true
     verb symbol: :*, ranks: [0, 0, 0]
     verb symbol: :/, ranks: [0, 0, 0]
     verb symbol: :^, ranks: [0, 0, 0]
@@ -35,18 +35,20 @@ module Calvin
     rule :dyad do
       Verbs.map do |verb|
         noun.as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
-          spaces? >> noun.as(:right)
+          (verb[:space] ? spaces : spaces?) >> word.as(:right)
       end.reduce(:|).as(:dyad)
     end
 
     # monad form
     rule :monad do
       Verbs.map do |verb|
-        str(verb[:symbol]).as(:symbol) >> spaces? >> noun.as(:expression)
+        str(verb[:symbol]).as(:symbol) >> (verb[:space] ? spaces : spaces?) >>
+          word.as(:expression)
       end.reduce(:|).as(:monad)
     end
 
-    rule(:sentence) { spaces? >> (dyad | monad | table | list | atom).as(:sentence) >> spaces? }
+    rule(:word) { dyad | monad | table | list | atom }
+    rule(:sentence) { spaces? >> word.as(:sentence) >> spaces? }
 
     rule(:sentences) { sentence.repeat }
 

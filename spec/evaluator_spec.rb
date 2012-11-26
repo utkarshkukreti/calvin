@@ -8,7 +8,7 @@ describe Calvin::Evaluator do
       eval1("-1.1").should eq -1.1
       eval1("-0.0").should eq 0.0
       eval1("- 1 -3 5").should eq [-1, 3, -5]
-      eval1("-[9 8, 7 -6 5]").should eq [[-9, -8], [-7, 6, -5]]
+      eval1("- [9 8, 7 -6 5]").should eq [[-9, -8], [-7, 6, -5]]
     end
 
     it "should evaluate sign (`*`) monad" do
@@ -124,6 +124,15 @@ describe Calvin::Evaluator do
       expect { eval1("2 5 % 3 4 1") }.to raise_exception(ArgumentError)
       expect { eval1("[2 5, 2 1] % 3 4") }.to raise_exception(ArgumentError)
       expect { eval1("[2 5, 2 1] % [3 4, 1 2 3]") }.to raise_exception(ArgumentError)
+    end
+  end
+
+  describe "chained verbs" do
+    it "should parse chained monads/dyads" do
+      eval1("1 + 2 + 3 4 + 4 5").should eq [10, 12]
+      eval1("1 - 2 * 4 + 4 5").should eq [-15, -17]
+      eval1("1 - 2 * 4 + 4 5").should eq [-15, -17]
+      eval1("1 - 1 - 1 2 3 + 3 4 5 - 6 7 8").should eq [-2, -1, 0]
     end
   end
 #   it "should parse foldl" do
