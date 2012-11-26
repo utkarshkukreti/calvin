@@ -58,34 +58,4 @@ describe Calvin::Evaluator do
 #     eval1("-\\:-2@1 2 3").should eq 2
 #     eval1("/2@^2@2+@1 2 3").should eq [4, 8, 12]
 #   end
-#
-#   it "should parse ranges" do
-#     eval1("..10").should eq 0..9
-#     eval1("1..100").should eq 1..100
-#     eval1("+\\1..100").should eq (100 * 101) / 2
-#     eval1("+\\..100").should eq (99 * 100) / 2
-#   end
-#
-#   it "should map ranges" do
-#     eval1("^2@1..3").should eq [1, 4, 9]
-#     eval1("2^@1..3").should eq [2, 4, 8]
-#   end
-#
-#   it "should apply monads to single element too" do
-#     eval1("*2@+\\1 2 3").should eq 12
-#   end
-#
-#   it "should save assigned variables in env" do
-#     e = Calvin::Evaluator.new
-#
-#     e.apply ast("a:=1")
-#     e.env["a"].should eq [1]
-#     e.apply(ast("a")[0]).should eq [1]
-#
-#     e.apply ast("a:=1 2 4")
-#     e.apply(ast("a")[0]).should eq [1, 2, 4]
-#
-#     e.apply ast("b:=+\\4..6")
-#     e.apply(ast("b")[0]).should eq 15
-#   end
 end
