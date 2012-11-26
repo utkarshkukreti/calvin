@@ -39,6 +39,8 @@ module Calvin
     verb symbol: :^, ranks: [0, 0, 0]
     verb symbol: :%, ranks: [0, 0, 0]
 
+    verb symbol: "="
+
     # dyad form
     rule :dyad do
       Verbs.map do |verb|

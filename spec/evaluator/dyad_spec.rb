@@ -41,6 +41,12 @@ describe Calvin::Evaluator do
       eval1("-1 % 2 4").should eq [1, 3]
       eval1("2 3 % -2").should eq [0, -1]
     end
+
+    it "should evaluate equals(`=`) dyad" do
+      eval1("1 = 0 1 1 0").should eq [false, true, true, false]
+      eval1("0 1 1 0 = 0").should eq [true, false, false, true]
+      eval1("0 -1 1 = -1").should eq [false, true, false]
+    end
   end
 
   describe "should evaluate dyads with 2 arrays" do
@@ -74,10 +80,20 @@ describe Calvin::Evaluator do
       eval1("2 5 % 2 7").should eq [0, 5]
     end
 
+
+    it "should evaluate equals(`=`) dyad" do
+      eval1("1 1 1 1 = 0 1 1 0").should eq [false, true, true, false]
+      eval1("0 1 1 0 = 0 1 0 0").should eq [true, true, false, true]
+      eval1("0 -1 1 = -1 0 1").should eq [false, false, true]
+    end
+  end
+
+  describe "exceptions" do
     it "should not allow dyads on uneven array size" do
       expect { eval1("2 5 % 3 4 1") }.to raise_exception(ArgumentError)
       expect { eval1("[2 5, 2 1] % 3 4") }.to raise_exception(ArgumentError)
       expect { eval1("[2 5, 2 1] % [3 4, 1 2 3]") }.to raise_exception(ArgumentError)
+      expect { eval1("1 2 = 2 3 4") }.to raise_exception(ArgumentError)
     end
   end
 end
