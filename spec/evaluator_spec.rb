@@ -135,6 +135,22 @@ describe Calvin::Evaluator do
       eval1("1 - 1 - 1 2 3 + 3 4 5 - 6 7 8").should eq [-2, -1, 0]
     end
   end
+
+  describe "variables" do
+    it "should store/retrieve variables" do
+      e = Calvin::Evaluator.new
+
+      e.apply ast("a = 10")
+      e.env["a"].should eq 10
+      e.apply ast("b =c = 10")
+      e.env["b"].should eq 10
+      e.env["c"].should eq 10
+      e.apply ast("a=b c")
+      e.env["a"].should eq [10, 10]
+      e.apply ast("d =a+b c + a")
+      e.env["d"].should eq [30, 30]
+    end
+  end
 #   it "should parse foldl" do
 #     eval1("+\\1 2 3").should eq 6
 #     eval1("-\\1 2 3").should eq -4

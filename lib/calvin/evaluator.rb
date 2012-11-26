@@ -6,6 +6,15 @@ module Calvin
       super
       @env = {}
 
+      rule assignment: { identifier: simple(:identifier),
+                         expression: subtree(:expression) } do |context|
+        @env[context[:identifier].to_s] = context[:expression]
+      end
+
+      rule deassignment: { identifier: simple(:identifier) } do |context|
+        @env[context[:identifier].to_s]
+      end
+
       rule monad: subtree(:monad) do
         symbol = monad[:symbol].to_sym
         expression = monad[:expression]
