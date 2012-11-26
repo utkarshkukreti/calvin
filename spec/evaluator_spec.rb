@@ -45,6 +45,21 @@ describe Calvin::Evaluator do
     end
   end
 
+  describe "should evaluate dyads" do
+    it "should evaluate plus(`+`) dyad" do
+      eval1("1 + 2 3").should eq [3, 4]
+      eval1("2 3 + 2").should eq [4, 5]
+      eval1("-1 + 2 3").should eq [1, 2]
+      eval1("2 3 + -2").should eq [0, 1]
+    end
+
+    it "should evaluate minus(`-`) dyad" do
+      eval1("1 - 2 3").should eq [-1, -2]
+      eval1("2 3 - 2").should eq [0, 1]
+      eval1("-1 - 2 3").should eq [-3, -4]
+      eval1("2 3 - -2").should eq [4, 5]
+    end
+  end
 #   it "should parse foldl" do
 #     eval1("+\\1 2 3").should eq 6
 #     eval1("-\\1 2 3").should eq -4

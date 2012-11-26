@@ -26,6 +26,34 @@ module Calvin
           Evaluator::Helpers.apply lambda { |x| x.abs },expression
         end
       end
+
+      rule dyad: subtree(:dyad) do
+        left = dyad[:left]
+        right = dyad[:right]
+        symbol = dyad[:symbol].to_sym
+
+        case symbol
+        when :+
+          if left.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| x + left }, right
+          elsif right.is_a?(Numeric)
+            # left must be array; TODO: add assertion
+            Evaluator::Helpers.apply lambda { |x| x + right }, left
+          else
+            # both must be arrays; TODO: add assertion
+          end
+
+        when :-
+          if left.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| left - x }, right
+          elsif right.is_a?(Numeric)
+            # left must be array; TODO: add assertion
+            Evaluator::Helpers.apply lambda { |x| x - right }, left
+          else
+            # both must be arrays; TODO: add assertion
+          end
+        end
+      end
     end
 
     # helpers
