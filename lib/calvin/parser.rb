@@ -53,8 +53,8 @@ module Calvin
       end.reduce(:|).as(:monad)
     end
 
-    rule(:word) { assignment | dyad | monad | table | list | atom }
-    rule(:sentence) { spaces? >> word.as(:sentence) >> spaces? }
+    rule(:word) { dyad | monad | table | list | atom }
+    rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
     rule(:sentences) { sentence.repeat }
 
