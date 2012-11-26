@@ -116,6 +116,14 @@ module Calvin
           end
         elsif left.is_a?(Numeric) && right.is_a?(Numeric)
           fn.call(left, right)
+        elsif left.is_a?(Numeric) && right.respond_to?(:map)
+          right.map do |r|
+            fn.call left, r
+          end
+        elsif right.is_a?(Numeric) && left.respond_to?(:map)
+          left.map do |l|
+            fn.call l, right
+          end
         else
           # Raise error: Structure doesn't match
           raise ArgumentError.new "Structure doesn't match. `left`'s class is #{left.class}, while `right`'s is #{right.class}."

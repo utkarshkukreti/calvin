@@ -125,12 +125,17 @@ describe Calvin::Evaluator do
     it "should evaluate greater than or equal to(`>=`) dyad" do
       eval1("1 2 3 >= 1 2 4").should eq [true, true, false]
     end
+
+    it "should apply single verb to a list if possible" do
+      eval1("1 2 * [6 7, 8 9]").should eq [[6, 7], [16, 18]]
+      eval1("[6 7, 8 9] % 3 2").should eq [[0, 1], [0, 1]]
+    end
   end
+
 
   describe "exceptions" do
     it "should not allow dyads on uneven array size" do
       expect { eval1("2 5 % 3 4 1") }.to raise_exception(ArgumentError)
-      expect { eval1("[2 5, 2 1] % 3 4") }.to raise_exception(ArgumentError)
       expect { eval1("[2 5, 2 1] % [3 4, 1 2 3]") }.to raise_exception(ArgumentError)
       expect { eval1("1 2 = 2 3 4") }.to raise_exception(ArgumentError)
     end
