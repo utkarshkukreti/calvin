@@ -1,9 +1,14 @@
 module Calvin
   class Parser < Parslet::Parser
     Verbs = []
+    Adverbs = []
 
     def self.verb(options)
       Verbs << options
+    end
+
+    def self.adverb(options)
+      Adverbs << options
     end
 
     rule(:spaces) { str(" ").repeat(1) }
@@ -48,6 +53,8 @@ module Calvin
 
     verb symbol: "#"
 
+    adverb symbol: "\\"
+
     # dyad form
     rule :dyad do
       Verbs.map do |verb|
@@ -58,8 +65,10 @@ module Calvin
 
     # monad form
     rule :monad do
+      adverbs = Adverbs.map{ |adverb| str adverb[:symbol] }.reduce(:|).as(:adverb)
       Verbs.map do |verb|
-        str(verb[:symbol]).as(:symbol) >> (verb[:space] ? spaces : spaces?) >>
+        str(verb[:symbol]).as(:symbol) >>
+          ((adverbs >> spaces?) | (verb[:space] ? spaces : spaces?)) >>
           word.as(:expression)
       end.reduce(:|).as(:monad)
     end

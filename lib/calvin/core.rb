@@ -1,6 +1,6 @@
 module Calvin
   class Core
-    ImpossibleException = Exception.new
+    ImpossibleException = Exception
 
     BinaryOperators = { add: "+", multiply: "*", subtract: "-", divide: "/", power: "^", modulo: "%" }.invert
     ComparisonOperators = { eq: "=", neq: "<>", lte: "<=", lt: "<", gte: ">=", gt: ">" }.invert

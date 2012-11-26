@@ -31,28 +31,48 @@ module Calvin
         symbol = monad[:symbol].to_sym
         expression = monad[:expression]
 
-        case symbol
-        when :+, :"=", :"<>", :<, :<=, :>, :>=
-          # Just return expression, for now.
-          expression
-        when :-
-          Evaluator::Helpers.apply lambda { |x| -x }, expression
-        when :*
-          Evaluator::Helpers.apply lambda { |x| x <=> 0 },expression
-        when :/
-          Evaluator::Helpers.apply lambda { |x| 1 / x },expression
-        when :^
-          Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
-        when :%
-          Evaluator::Helpers.apply lambda { |x| x.abs },expression
-        when :"#"
-          # count doesn't apply atomically. It always returns a single integer.
-          if expression.is_a?(Numeric)
-            1
-          elsif expression.respond_to?(:size)
-            expression.size
+        if monad[:adverb]
+          case monad[:adverb]
+          when "\\"
+            case symbol
+            when :+, :-, :*, :/, :%
+              Evaluator::Helpers.foldr symbol, expression
+            when :^
+              Evaluator::Helpers.foldr :**, expression
+            when :"="
+              Evaluator::Helpers.foldr :"==", expression
+            when :"<>"
+              Evaluator::Helpers.foldr :"!=", expression
+            when :<, :<=, :>, :>=
+              Evaluator::Helpers.foldr symbol, expression
+            end
           else
-            raise ArgumentError.new "Cannot calculate size of `expression` #{expression.inspect}"
+            raise Core::ImpossibleException.new "Invalid adverb in monad #{monad.inspect}."
+          end
+        else
+          case symbol
+          when :+, :"=", :"<>", :<, :<=, :>, :>=
+            # Just return expression, for now.
+            expression
+          when :-
+            Evaluator::Helpers.apply lambda { |x| -x }, expression
+          when :*
+            Evaluator::Helpers.apply lambda { |x| x <=> 0 },expression
+          when :/
+            Evaluator::Helpers.apply lambda { |x| 1 / x },expression
+          when :^
+            Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
+          when :%
+            Evaluator::Helpers.apply lambda { |x| x.abs },expression
+          when :"#"
+            # count doesn't apply atomically. It always returns a single integer.
+            if expression.is_a?(Numeric)
+              1
+            elsif expression.respond_to?(:size)
+              expression.size
+            else
+              raise ArgumentError.new "Cannot calculate size of `expression` #{expression.inspect}"
+            end
           end
         end
       end
@@ -86,6 +106,23 @@ module Calvin
           object.map { |el| apply(fn, el) }
         else
           fn.call object
+        end
+      end
+
+      def foldr(fn, object)
+        comparison = %w{== <> > >= < <=}.include?(fn.to_s)
+        if comparison
+          if !object.respond_to?(:reduce)
+            0.send(fn, object)
+          else
+            object.each_cons(2).reduce do |fold, (left, right)|
+              fold && left.send(fn, right)
+            end
+          end
+        elsif object.respond_to?(:reduce)
+          object.reverse.reduce { |fold, el| el.send(fn, fold) }
+        else
+          object
         end
       end
 
