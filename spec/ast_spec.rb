@@ -21,10 +21,24 @@ describe Calvin::AST do
       ast1("12 2.3").should eq list: [12, 2.3]
     end
   end
-  
+
   describe "Table" do
     it "should parse tables" do
       ast1("[1 1, 2 2]").should eq table: [{list: [1, 1]}, {list: [2, 2]}]
+    end
+  end
+
+  describe "Monads" do
+    it "should parse simple monads" do
+      ast1("-1").should eq monad: { symbol: "-", expression: 1 }
+      ast1("/1").should eq monad: { symbol: "/", expression: 1 }
+    end
+  end
+
+  describe "Dyads" do
+    it "should parse simple dyads" do
+      ast1("1 + 1").should eq dyad: { left: 1, symbol: "+", right: 1 }
+      ast1("1 ^1").should eq dyad: { left: 1, symbol: "^", right: 1 }
     end
   end
 end

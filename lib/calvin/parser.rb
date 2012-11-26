@@ -23,6 +23,11 @@ module Calvin
     # Rank: 0 = atom, 1 = list, 2 = table, ...
     #                L, M, R
     verb symbol: :+, ranks: [0, 0, 0]
+    verb symbol: :-, ranks: [0, 0, 0]
+    verb symbol: :*, ranks: [0, 0, 0]
+    verb symbol: :/, ranks: [0, 0, 0]
+    verb symbol: :^, ranks: [0, 0, 0]
+    verb symbol: :%, ranks: [0, 0, 0]
 
     # dyad form
     rule :dyad do
