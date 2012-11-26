@@ -35,12 +35,12 @@ module Calvin
         case symbol
         when :+
           if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| x + left }, right
+            Evaluator::Helpers.apply lambda { |x| left + x }, right
           elsif right.is_a?(Numeric)
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x + right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left + right }, left, right
           end
 
         when :-
@@ -50,7 +50,7 @@ module Calvin
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x - right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left - right }, left, right
           end
 
         when :*
@@ -60,7 +60,7 @@ module Calvin
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x * right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left * right }, left, right
           end
 
         when :/
@@ -70,7 +70,7 @@ module Calvin
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x / right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left / right }, left, right
           end
 
         when :^
@@ -80,7 +80,7 @@ module Calvin
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x ** right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left ** right }, left, right
           end
 
         when :%
@@ -90,7 +90,7 @@ module Calvin
             # left must be array; TODO: add assertion
             Evaluator::Helpers.apply lambda { |x| x % right }, left
           else
-            # both must be arrays; TODO: add assertion
+            Evaluator::Helpers.apply_each lambda { |left, right| left % right }, left, right
           end
         end
       end
@@ -105,6 +105,24 @@ module Calvin
           object.map { |el| apply(fn, el) }
         else
           fn.call object
+        end
+      end
+
+      def apply_each(fn, left, right)
+        if left.is_a?(Array) && right.is_a?(Array)
+          if left.size == right.size
+            left.zip(right).map do |l, r|
+              apply_each(fn, l, r)
+            end
+          else
+            # Raise error: Size doesn't match
+            raise ArgumentError.new "Array size doesn't match. `left` had size #{left.size}, while `right` had size #{right.size}."
+          end
+        elsif left.is_a?(Numeric) && right.is_a?(Numeric)
+          fn.call(left, right)
+        else
+          # Raise error: Structure doesn't match
+          raise ArgumentError.new "Structure doesn't match. `left`'s class is #{left.class}, while `right`'s is #{right.class}."
         end
       end
     end
