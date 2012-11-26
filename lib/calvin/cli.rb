@@ -24,7 +24,7 @@ module Calvin
         Readline::HISTORY.push line
 
         begin
-          ast = AST.new(line).ast
+          ast = AST.new.parse(line)
 
           if @verbose
             puts  "      AST: #{ast.inspect}"
