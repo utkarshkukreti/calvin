@@ -20,6 +20,10 @@ module Calvin
           Evaluator::Helpers.sign expression
         when :/
           Evaluator::Helpers.reciprocal expression
+        when :^
+          Evaluator::Helpers.exponential expression
+        when :%
+          Evaluator::Helpers.magnitude expression
         end
       end
     end
@@ -49,6 +53,22 @@ module Calvin
           object.map(&method(:reciprocal))
         else
           1 / object
+        end
+      end
+
+      def exponential(object)
+        if object.is_a?(Array)
+          object.map(&method(:exponential))
+        else
+          Math::E ** object
+        end
+      end
+
+      def magnitude(object)
+        if object.is_a?(Array)
+          object.map(&method(:magnitude))
+        else
+          object.abs
         end
       end
     end

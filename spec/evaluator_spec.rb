@@ -26,6 +26,23 @@ describe Calvin::Evaluator do
       eval1("* -1 -2 -4").should eq [-1, -1, -1]
       eval1("*[9 8, 7 -6 0]").should eq [[1, 1], [1, -1, 0]]
     end
+
+    it "should evaluate exponential (`^`) monad" do
+      def e(num); Math::E ** num; end
+      eval1("^3").should eq e(3)
+      eval1("^1.1").should eq e(1.1)
+      eval1("^0").should eq e(0)
+      eval1("^ -1 2 -4").should eq [e(-1), e(2), e(-4)]
+      eval1("^[9 8, 7 -6 0]").should eq [[e(9), e(8)], [e(7), e(-6), e(0)]]
+    end
+
+    it "should evaluate magnitude/absolute (`%`) monad" do
+      eval1("%1.1").should eq 1.1
+      eval1("%0").should eq 0
+      eval1("%-1.1").should eq 1.1
+      eval1("% -1 -2 4").should eq [1, 2, 4]
+      eval1("%[9 8, 7 -6 0]").should eq [[9, 8], [7, 6, 0]]
+    end
   end
 
 #   it "should parse foldl" do
