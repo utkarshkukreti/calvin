@@ -18,6 +18,8 @@ module Calvin
           Evaluator::Helpers.negate expression
         when :*
           Evaluator::Helpers.sign expression
+        when :/
+          Evaluator::Helpers.reciprocal expression
         end
       end
     end
@@ -39,6 +41,14 @@ module Calvin
           object.map(&method(:sign))
         else
           object <=> 0
+        end
+      end
+
+      def reciprocal(object)
+        if object.is_a?(Array)
+          object.map(&method(:reciprocal))
+        else
+          1 / object
         end
       end
     end

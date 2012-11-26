@@ -19,6 +19,13 @@ describe Calvin::Evaluator do
       eval1("* 1 -3 5").should eq [1, -1, 1]
       eval1("*[9 8, 7 -6 0]").should eq [[1, 1], [1, -1, 0]]
     end
+
+    it "should evaluate reciprocal (`/`) monad" do
+      eval1("*1.1").should eq 1
+      eval1("*0.0").should eq 0
+      eval1("* -1 -2 -4").should eq [-1, -1, -1]
+      eval1("*[9 8, 7 -6 0]").should eq [[1, 1], [1, -1, 0]]
+    end
   end
 
 #   it "should parse foldl" do
