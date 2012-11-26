@@ -33,18 +33,10 @@ module Calvin
         symbol = dyad[:symbol].to_sym
 
         case symbol
-        when :+
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left + right }, left, right
-        when :-
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left - right }, left, right
-        when :*
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left * right }, left, right
-        when :/
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left / right }, left, right
+        when :+, :-, :*, :/, :%
+          Evaluator::Helpers.apply_dyad symbol, left, right
         when :^
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left ** right }, left, right
-        when :%
-          Evaluator::Helpers.apply_dyad lambda { |left, right| left % right }, left, right
+          Evaluator::Helpers.apply_dyad :**, left, right
         end
       end
     end
@@ -62,6 +54,11 @@ module Calvin
       end
 
       def apply_dyad(fn, left, right)
+        if fn.is_a?(Symbol)
+          sym = fn
+          fn = lambda { |left, right| left.send(sym, right) }
+        end
+
         if left.is_a?(Numeric)
           Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
         elsif right.is_a?(Numeric)
