@@ -19,11 +19,19 @@ module Calvin
         prompt = "> "
         line = Readline::readline(prompt)
 
-        exit if line.nil? || line == "exit"
+        if line.nil? || line == "exit"
+          # Pressing Ctrl-D doesn't create a new line like <CR> after "exit"
+          # So, print a new line!
+          puts if line.nil?
+          puts "Bye!"
+          exit
+        end
 
         Readline::HISTORY.push line
 
         begin
+          next if line == ""
+
           ast = AST.new.parse(line)
 
           if @verbose
