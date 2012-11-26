@@ -34,64 +34,17 @@ module Calvin
 
         case symbol
         when :+
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left + x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x + right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left + right }, left, right
-          end
-
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left + right }, left, right
         when :-
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left - x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x - right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left - right }, left, right
-          end
-
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left - right }, left, right
         when :*
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left * x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x * right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left * right }, left, right
-          end
-
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left * right }, left, right
         when :/
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left / x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x / right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left / right }, left, right
-          end
-
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left / right }, left, right
         when :^
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left ** x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x ** right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left ** right }, left, right
-          end
-
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left ** right }, left, right
         when :%
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| left % x }, right
-          elsif right.is_a?(Numeric)
-            # left must be array; TODO: add assertion
-            Evaluator::Helpers.apply lambda { |x| x % right }, left
-          else
-            Evaluator::Helpers.apply_each lambda { |left, right| left % right }, left, right
-          end
+          Evaluator::Helpers.apply_dyad lambda { |left, right| left % right }, left, right
         end
       end
     end
@@ -105,6 +58,16 @@ module Calvin
           object.map { |el| apply(fn, el) }
         else
           fn.call object
+        end
+      end
+
+      def apply_dyad(fn, left, right)
+        if left.is_a?(Numeric)
+          Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
+        elsif right.is_a?(Numeric)
+          Evaluator::Helpers.apply lambda { |x| fn.call(x, right) }, left
+        else
+          Evaluator::Helpers.apply_each fn, left, right
         end
       end
 
