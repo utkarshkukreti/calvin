@@ -13,8 +13,10 @@ module Calvin
     rule(:integer) { (str("-").maybe >> digit.repeat(1)).as(:integer) }
     rule(:float) { (str("-").maybe >> digit.repeat(1) >> str(".") >>
                     digit.repeat(1)).as(:float) }
+    rule(:range) { ((integer.maybe.as(:first)) >> str("..") >>
+                    integer.as(:last)).as(:range) }
 
-    rule(:atom) { (float | integer | deassignment).as(:atom) }
+    rule(:atom) { (range | float | integer | deassignment).as(:atom) }
 
     rule(:list) { (atom >> (spaces >> atom).repeat(1)).as(:list) }
 

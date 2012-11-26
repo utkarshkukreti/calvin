@@ -15,6 +15,22 @@ module Calvin
         @env[context[:identifier].to_s]
       end
 
+      rule range: { first: simple(:first), last: simple(:last) } do
+        if first
+          if last >= first
+            first..last
+          else
+            raise ArgumentError.new "`first` should be less than or equal to `last`. You passed in #{first} and #{last}."
+          end
+        else
+          if last >= 0
+            0..(last - 1)
+          else
+            raise ArgumentError.new "`last` should be greater than 0. You passed in #{last}."
+          end
+        end
+      end
+
       rule monad: subtree(:monad) do
         symbol = monad[:symbol].to_sym
         expression = monad[:expression]

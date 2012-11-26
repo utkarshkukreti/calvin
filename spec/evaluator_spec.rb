@@ -164,6 +164,19 @@ describe Calvin::Evaluator do
     end
   end
 
+  describe "ranges" do
+    it "should parse valid ranges" do
+      eval1("..10").should eq 0..9
+      eval1("1..100").should eq 1..100
+      eval1("-10..10").should eq -10..10
+    end
+
+    it "should not parse invalid ranges" do
+      expect { eval1("5..-5") }.to raise_exception
+      expect { eval1("..-5") }.to raise_exception
+    end
+  end
+
 #   it "should parse foldl" do
 #     eval1("+\\1 2 3").should eq 6
 #     eval1("-\\1 2 3").should eq -4
