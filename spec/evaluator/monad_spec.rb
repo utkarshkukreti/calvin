@@ -41,5 +41,11 @@ describe Calvin::Evaluator do
       eval1("% -1 -2 4").should eq [1, 2, 4]
       eval1("%[9 8, 7 -6 0]").should eq [[9, 8], [7, 6, 0]]
     end
+
+    it "should evaluate count (`#`) monad" do
+      eval1("#1").should eq 1
+      eval1("# 1 2 3").should eq 3
+      eval1("# [1 2, 3 4 5]").should eq 2
+    end
   end
 end

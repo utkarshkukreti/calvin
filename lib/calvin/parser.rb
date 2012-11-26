@@ -46,6 +46,8 @@ module Calvin
     verb symbol: :>=
     verb symbol: :>
 
+    verb symbol: "#"
+
     # dyad form
     rule :dyad do
       Verbs.map do |verb|

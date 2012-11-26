@@ -45,6 +45,15 @@ module Calvin
           Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
         when :%
           Evaluator::Helpers.apply lambda { |x| x.abs },expression
+        when :"#"
+          # count doesn't apply atomically. It always returns a single integer.
+          if expression.is_a?(Numeric)
+            1
+          elsif expression.respond_to?(:size)
+            expression.size
+          else
+            raise ArgumentError.new "Cannot calculate size of `expression` #{expression.inspect}"
+          end
         end
       end
 
