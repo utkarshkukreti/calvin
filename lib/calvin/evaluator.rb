@@ -27,11 +27,17 @@ module Calvin
         end
       end
 
-      rule monad: subtree(:monad) do
-        symbol = monad[:symbol].to_sym
+      rule monad: subtree(:monad) do |context|
+        monad = context[:monad]
         expression = monad[:expression]
 
-        if monad[:adverb]
+        if monad[:function].is_a?(Array)
+          # sequence of functions
+          monad[:function].reverse.reduce(expression) do |fold, function|
+            apply monad: function.merge(expression: fold)
+          end
+        elsif monad[:adverb]
+          symbol = monad[:symbol].to_sym
           case monad[:adverb]
           when "\\"
             case symbol
@@ -50,6 +56,7 @@ module Calvin
             raise Core::ImpossibleException.new "Invalid adverb in monad #{monad.inspect}."
           end
         else
+          symbol = monad[:symbol].to_sym
           case symbol
           when :+, :"=", :"<>", :<, :<=, :>, :>=
             # Just return expression, for now.
@@ -120,7 +127,9 @@ module Calvin
             end
           end
         elsif object.respond_to?(:reduce)
-          object.reverse.reduce { |fold, el| el.send(fn, fold) }
+          object.reverse.reduce do |left, right|
+            apply_dyad fn, right, left
+          end
         else
           object
         end

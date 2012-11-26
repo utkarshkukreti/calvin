@@ -66,14 +66,25 @@ module Calvin
     # monad form
     rule :monad do
       adverbs = Adverbs.map{ |adverb| str adverb[:symbol] }.reduce(:|).as(:adverb)
-      Verbs.map do |verb|
+      verbs = Verbs.map do |verb|
         str(verb[:symbol]).as(:symbol) >>
-          ((adverbs >> spaces?) | (verb[:space] ? spaces : spaces?)) >>
-          word.as(:expression)
-      end.reduce(:|).as(:monad)
+          ((adverbs >> spaces?) | (verb[:space] ? spaces : spaces?))
+      end.reduce(:|)
+      verbs |= function
+      (verbs >> word.as(:expression)).as(:monad)
     end
 
-    rule(:word) { dyad | monad | table | list | atom | (pword >> word.maybe).as(:parentheses) }
+    rule :monad_function do
+      adverbs = Adverbs.map{ |adverb| str adverb[:symbol] }.reduce(:|).as(:adverb)
+      verbs = Verbs.map { |verb| str verb[:symbol] }.reduce(:|).as(:symbol)
+      verbs >> adverbs.maybe
+    end
+
+    rule :function do
+      (str("{") >> monad_function.repeat(1) >> str("}")).as(:function)
+    end
+
+    rule(:word) { dyad | monad | function | table | list | atom | (pword >> word.maybe).as(:parentheses) }
     rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
     rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
