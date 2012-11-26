@@ -27,18 +27,19 @@ module Calvin
         end
       end
 
-      rule monad: subtree(:monad) do |context|
-        monad = context[:monad]
-        expression = monad[:expression]
+      rule monad: { function: subtree(:function), expression: subtree(:expression) } do |context|
+        function = context[:function]
+        expression = context[:expression]
 
-        if monad[:function].is_a?(Array)
-          # sequence of functions
-          monad[:function].reverse.reduce(expression) do |fold, function|
-            apply monad: function.merge(expression: fold)
-          end
-        elsif monad[:adverb]
-          symbol = monad[:symbol].to_sym
-          case monad[:adverb]
+        function.reverse.reduce(expression) do |fold, function|
+          apply monad: function.merge(expression: fold)
+        end
+      end
+
+      rule monad: { symbol: simple(:_symbol), adverb: simple(:adverb),
+                    expression: subtree(:expression) } do
+          symbol = _symbol.to_sym
+          case adverb
           when "\\"
             case symbol
             when :+, :-, :*, :/, :%
@@ -55,31 +56,32 @@ module Calvin
           else
             raise Core::ImpossibleException.new "Invalid adverb in monad #{monad.inspect}."
           end
-        else
-          symbol = monad[:symbol].to_sym
-          case symbol
-          when :+, :"=", :"<>", :<, :<=, :>, :>=
-            # Just return expression, for now.
-            expression
-          when :-
-            Evaluator::Helpers.apply lambda { |x| -x }, expression
-          when :*
-            Evaluator::Helpers.apply lambda { |x| x <=> 0 },expression
-          when :/
-            Evaluator::Helpers.apply lambda { |x| 1 / x },expression
-          when :^
-            Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
-          when :%
-            Evaluator::Helpers.apply lambda { |x| x.abs },expression
-          when :"#"
-            # count doesn't apply atomically. It always returns a single integer.
-            if expression.is_a?(Numeric)
-              1
-            elsif expression.respond_to?(:size)
-              expression.size
-            else
-              raise ArgumentError.new "Cannot calculate size of `expression` #{expression.inspect}"
-            end
+      end
+
+      rule monad: { symbol: simple(:_symbol), expression: subtree(:expression) } do
+        symbol = _symbol.to_sym
+        case symbol
+        when :+, :"=", :"<>", :<, :<=, :>, :>=
+          # Just return expression, for now.
+          expression
+        when :-
+          Evaluator::Helpers.apply lambda { |x| -x }, expression
+        when :*
+          Evaluator::Helpers.apply lambda { |x| x <=> 0 },expression
+        when :/
+          Evaluator::Helpers.apply lambda { |x| 1 / x },expression
+        when :^
+          Evaluator::Helpers.apply lambda { |x| Math::E ** x },expression
+        when :%
+          Evaluator::Helpers.apply lambda { |x| x.abs },expression
+        when :"#"
+          # count doesn't apply atomically. It always returns a single integer.
+          if expression.is_a?(Numeric)
+            1
+          elsif expression.respond_to?(:size)
+            expression.size
+          else
+            raise ArgumentError.new "Cannot calculate size of `expression` #{expression.inspect}"
           end
         end
       end
