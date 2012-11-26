@@ -17,16 +17,12 @@ module Calvin
 
       rule range: { first: simple(:first), last: simple(:last) } do
         if first
-          if last >= first
-            first..last
-          else
-            raise ArgumentError.new "`first` should be less than or equal to `last`. You passed in #{first} and #{last}."
-          end
+          AST::Range.new first, last
         else
           if last >= 0
-            0..(last - 1)
+            AST::Range.new 0, last - 1
           else
-            raise ArgumentError.new "`last` should be greater than 0. You passed in #{last}."
+            raise ArgumentError.new "`last` should be greater than 0 when `first` isn't specified. You passed in #{last}."
           end
         end
       end
@@ -71,8 +67,7 @@ module Calvin
       extend self
 
       def apply(fn, object)
-        object = object.to_a if object.respond_to?(:to_a)
-        if object.is_a?(Array)
+        if object.respond_to?(:map)
           object.map { |el| apply(fn, el) }
         else
           fn.call object
@@ -95,10 +90,7 @@ module Calvin
       end
 
       def apply_each(fn, left, right)
-        left  = left.to_a  if left.respond_to?(:to_a)
-        right = right.to_a if right.respond_to?(:to_a)
-
-        if left.is_a?(Array) && right.is_a?(Array)
+        if left.respond_to?(:map) && right.respond_to?(:map)
           if left.size == right.size
             left.zip(right).map do |l, r|
               apply_each(fn, l, r)
