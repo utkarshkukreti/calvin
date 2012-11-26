@@ -72,6 +72,26 @@ module Calvin
           else
             # both must be arrays; TODO: add assertion
           end
+
+        when :^
+          if left.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| left ** x }, right
+          elsif right.is_a?(Numeric)
+            # left must be array; TODO: add assertion
+            Evaluator::Helpers.apply lambda { |x| x ** right }, left
+          else
+            # both must be arrays; TODO: add assertion
+          end
+
+        when :%
+          if left.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| left % x }, right
+          elsif right.is_a?(Numeric)
+            # left must be array; TODO: add assertion
+            Evaluator::Helpers.apply lambda { |x| x % right }, left
+          else
+            # both must be arrays; TODO: add assertion
+          end
         end
       end
     end
