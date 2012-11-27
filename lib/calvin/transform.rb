@@ -1,7 +1,7 @@
 module Calvin
   class Transform < Parslet::Transform
-    rule(integer:     simple(:x))  { x.to_i }
-    rule(float:       simple(:x))  { x.to_f }
+    rule(integer:     simple(:x))  { x.to_s.sub("_", "-").to_i }
+    rule(float:       simple(:x))  { x.to_s.sub("_", "-").to_f }
     rule(atom:        subtree(:x)) { x }
     rule(list:        subtree(:x)) { x }
     rule(table:       subtree(:x)) { x }

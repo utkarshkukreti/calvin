@@ -36,14 +36,14 @@ module Calvin
         end
       end
 
-      rule monad: { symbol: simple(:_symbol), adverb: simple(:adverb),
+      rule monad: { verb: simple(:_verb), adverb: simple(:adverb),
                     expression: subtree(:expression) } do
-          symbol = _symbol.to_sym
+          verb = _verb.to_sym
           case adverb
           when "\\"
-            case symbol
+            case verb
             when :+, :-, :*, :/, :%
-              Evaluator::Helpers.foldr symbol, expression
+              Evaluator::Helpers.foldr verb, expression
             when :^
               Evaluator::Helpers.foldr :**, expression
             when :"="
@@ -51,16 +51,16 @@ module Calvin
             when :"<>"
               Evaluator::Helpers.foldr :"!=", expression
             when :<, :<=, :>, :>=
-              Evaluator::Helpers.foldr symbol, expression
+              Evaluator::Helpers.foldr verb, expression
             end
           else
             raise Core::ImpossibleException.new "Invalid adverb in monad #{monad.inspect}."
           end
       end
 
-      rule monad: { symbol: simple(:_symbol), expression: subtree(:expression) } do
-        symbol = _symbol.to_sym
-        case symbol
+      rule monad: { verb: simple(:_verb), expression: subtree(:expression) } do
+        verb = _verb.to_sym
+        case verb
         when :+, :"=", :"<>", :<, :<=, :>, :>=
           # Just return expression, for now.
           expression
@@ -89,11 +89,11 @@ module Calvin
       rule dyad: subtree(:dyad) do
         left = dyad[:left]
         right = dyad[:right]
-        symbol = dyad[:symbol].to_sym
+        verb = dyad[:verb].to_sym
 
-        case symbol
+        case verb
         when :+, :-, :*, :/, :%
-          Evaluator::Helpers.apply_dyad symbol, left, right
+          Evaluator::Helpers.apply_dyad verb, left, right
         when :^
           Evaluator::Helpers.apply_dyad :**, left, right
         when :"="
@@ -101,7 +101,7 @@ module Calvin
         when :"<>"
           Evaluator::Helpers.apply_dyad :"!=", left, right
         when :<, :<=, :>, :>=
-          Evaluator::Helpers.apply_dyad symbol, left, right
+          Evaluator::Helpers.apply_dyad verb, left, right
         end
       end
     end

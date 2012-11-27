@@ -3,20 +3,20 @@ module Calvin
     Verbs = []
     Adverbs = []
 
-    def self.verb(options)
-      Verbs << options
+    def self.verb(verb, options = {})
+      Verbs << options.merge(verb: verb)
     end
 
-    def self.adverb(options)
-      Adverbs << options
+    def self.adverb(adverb, options = {})
+      Adverbs << options.merge(adverb: adverb)
     end
 
     rule(:spaces) { str(" ").repeat(1) }
     rule(:spaces?) { spaces.maybe }
     rule(:digit) { match["0-9"] }
 
-    rule(:integer) { (str("-").maybe >> digit.repeat(1)).as(:integer) }
-    rule(:float) { (str("-").maybe >> digit.repeat(1) >> str(".") >>
+    rule(:integer) { (str("_").maybe >> digit.repeat(1)).as(:integer) }
+    rule(:float) { (str("_").maybe >> digit.repeat(1) >> str(".") >>
                     digit.repeat(1)).as(:float) }
     rule(:range) { ((integer.maybe.as(:first)) >> str("..") >>
                     integer.as(:last)).as(:range) }
@@ -37,54 +37,38 @@ module Calvin
 
     # Rank: 0 = atom, 1 = list, 2 = table, ...
     #                        L, M, R
-    verb symbol: :+, ranks: [0, 0, 0]
-    verb symbol: :-, ranks: [0, 0, 0], space: true
-    verb symbol: :*, ranks: [0, 0, 0]
-    verb symbol: :/, ranks: [0, 0, 0]
-    verb symbol: :^, ranks: [0, 0, 0]
-    verb symbol: :%, ranks: [0, 0, 0]
+    verb :+, ranks: [0, 0, 0]
+    verb :-, ranks: [0, 0, 0], space: true
+    verb :*, ranks: [0, 0, 0]
+    verb :/, ranks: [0, 0, 0]
+    verb :^, ranks: [0, 0, 0]
+    verb :%, ranks: [0, 0, 0]
 
-    verb symbol: "="
-    verb symbol: "<>"
-    verb symbol: :<=
-    verb symbol: :<
-    verb symbol: :>=
-    verb symbol: :>
+    verb "="
+    verb "<>"
+    verb :<=
+    verb :<
+    verb :>=
+    verb :>
 
-    verb symbol: "#"
+    verb "#"
 
-    adverb symbol: "\\"
+    adverb "\\"
 
     # dyad form
     rule :dyad do
-      Verbs.map do |verb|
-        (pword | noun).as(:left) >> spaces? >> str(verb[:symbol]).as(:symbol) >>
-          (verb[:space] ? spaces : spaces?) >> word.as(:right)
-      end.reduce(:|).as(:dyad)
+      verbs = Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
+      ((pword | noun).as(:left) >> spaces? >> verbs >> spaces? >> word.as(:right)).as(:dyad)
     end
 
     # monad form
     rule :monad do
-      adverbs = Adverbs.map{ |adverb| str adverb[:symbol] }.reduce(:|).as(:adverb)
-      verbs = Verbs.map do |verb|
-        str(verb[:symbol]).as(:symbol) >>
-          ((adverbs >> spaces?) | (verb[:space] ? spaces : spaces?))
-      end.reduce(:|)
-      verbs |= function
-      (verbs >> word.as(:expression)).as(:monad)
+      adverbs = Adverbs.map { |adverb| str adverb[:adverb] }.reduce(:|).as(:adverb)
+      verbs = Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
+      ((verbs >> spaces? >> adverbs.maybe) >> spaces? >> word.as(:expression)).as(:monad)
     end
 
-    rule :monad_function do
-      adverbs = Adverbs.map{ |adverb| str adverb[:symbol] }.reduce(:|).as(:adverb)
-      verbs = Verbs.map { |verb| str verb[:symbol] }.reduce(:|).as(:symbol)
-      verbs >> adverbs.maybe
-    end
-
-    rule :function do
-      (str("{") >> monad_function.repeat(1) >> str("}")).as(:function)
-    end
-
-    rule(:word) { dyad | monad | function | table | list | atom | (pword >> word.maybe).as(:parentheses) }
+    rule(:word) { dyad | monad | table | list | atom | (pword >> word.maybe).as(:parentheses) }
     rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
     rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
