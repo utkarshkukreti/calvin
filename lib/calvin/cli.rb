@@ -51,7 +51,14 @@ module Calvin
           log "      AST: #{ast.inspect}"
           log "Evaluated: "
 
-          p evaluator.apply(ast)[0]
+          if @verbose
+            start_time = Time.now
+            ret = evaluator.apply(ast)[0]
+            puts "Time taken: #{Time.now - start_time}s"
+            p ret
+          else
+            p evaluator.apply(ast)[0]
+          end
         rescue Exception => e
           puts e
           p e.message
