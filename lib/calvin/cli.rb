@@ -12,6 +12,15 @@ module Calvin
       evaluator = Evaluator.new
       require 'readline'
 
+      # load history
+      if File.exist?(Core::HistoryFile)
+        log ">>> Loading History from #{Core::HistoryFile}..."
+        `tail -256 #{Core::HistoryFile}`.split("\n").each do |line|
+          Readline::HISTORY.push line
+        end
+        log ">>> Pushed #{Readline::HISTORY.size} lines into the buffer."
+      end
+
       puts "Calvin Programming Language REPL."
       puts "Type exit or press Ctrl-D to exit."
       lines = ""
@@ -27,6 +36,11 @@ module Calvin
           exit
         end
 
+        # write history
+        File.open(Core::HistoryFile, "a") do |f|
+          f.puts line
+        end
+
         Readline::HISTORY.push line
 
         begin
@@ -34,10 +48,8 @@ module Calvin
 
           ast = AST.new.parse(line)
 
-          if @verbose
-            puts  "      AST: #{ast.inspect}"
-            print "Evaluated: "
-          end
+          log "      AST: #{ast.inspect}"
+          log "Evaluated: "
 
           p evaluator.apply(ast)[0]
         rescue Exception => e
@@ -46,6 +58,11 @@ module Calvin
           puts e.backtrace
         end
       end
+    end
+
+    private
+    def log(line)
+      puts line if @verbose
     end
   end
 end
