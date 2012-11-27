@@ -33,7 +33,18 @@ describe Calvin::Evaluator do
 
     it "should apply adverbs to ranges" do
       eval1("+\\1..10").should eq 55
+      eval1("+\\1.4..9").should eq 12
       eval1("+\\_5._4..10").should eq 40
+
+      # Large tests; to make sure performance is linear.
+      # Specs won't terminate if it takes too long :)
+      n = 1_000_000_000
+      eval1("+\\1..#{n}").should eq (n * (n + 1) / 2)
+      eval1("+\\_#{n}..#{n}").should eq 0
+      eval1("+\\_#{n}..#{n+1}").should eq n + 1
+
+      step = 4
+      eval1("+\\1.#{step + 1}..#{n}").should eq eval1("+\\1..#{n}") / 4 - (n / 4) - (n / 8)
     end
 
     it "should return `.inspect` of `.to_a` on `.inspect`" do

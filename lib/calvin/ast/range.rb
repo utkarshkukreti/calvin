@@ -29,7 +29,11 @@ module Calvin
       end
 
       def size
-        1 + (@first - @last).abs
+        1 + ((last - first) / step).abs
+      end
+
+      def step
+        second ? second - first : (first > last ? -1 : 1)
       end
 
       def ==(other)
@@ -37,7 +41,15 @@ module Calvin
           other.respond_to?(:first) && other.first == @first &&
           other.respond_to?(:last) && other.last == @last
         else
-          to_a == other
+          case other
+          when Array
+            to_a == other
+          when AST::Range
+            other.first == first && other.step == step &&
+              other.last == last
+          else
+            false
+          end
         end
       end
 

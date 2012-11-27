@@ -129,8 +129,19 @@ module Calvin
             end
           end
         elsif object.respond_to?(:reduce)
-          object.reverse_each.reduce do |left, right|
-            apply_dyad fn, right, left
+          if object.is_a?(AST::Range)
+            first = object.first
+            last = object.last
+            size = object.size
+            step = object.step
+            case fn
+            when :+
+              (size  * (2 * first + (size - 1) * step)) / 2
+            end
+          else
+            object.reverse_each.reduce do |left, right|
+              apply_dyad fn, right, left
+            end
           end
         else
           object
