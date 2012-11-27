@@ -40,6 +40,10 @@ module Calvin
           to_a
         end
       end
+
+      def inspect
+        to_a.inspect
+      end
     end
   end
 end

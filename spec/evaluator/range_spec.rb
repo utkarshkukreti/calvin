@@ -34,5 +34,9 @@ describe Calvin::Evaluator do
     it "should apply adverbs to ranges" do
       eval1("+\\1..10").should eq 55
     end
+
+    it "should return `.inspect` of `.to_a` on `.inspect`" do
+      eval1("1._4.._10").inspect.should eq [1, -4, -9].inspect
+    end
   end
 end
