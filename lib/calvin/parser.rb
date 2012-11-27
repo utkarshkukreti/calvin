@@ -77,7 +77,11 @@ module Calvin
       (verb >> spaces? >> adverb.maybe >> spaces? >> word.as(:expression)).as(:monad)
     end
 
-    rule(:word) { dyad | monad | table | list | atom | (pword >> word.maybe).as(:parentheses) }
+    rule :lambda do
+      (verb >> adverb.maybe).repeat(1).as(:lambda)
+    end
+
+    rule(:word) { dyad | monad | lambda | table | list | atom | (pword >> word.maybe).as(:parentheses) }
     rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
     rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
