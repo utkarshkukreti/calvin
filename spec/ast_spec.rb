@@ -30,8 +30,8 @@ describe Calvin::AST do
 
   describe "Monads" do
     it "should parse simple monads" do
-      ast1("- 1").should eq monad: { verb: "-", expression: 1 }
-      ast1("/1").should eq monad: { verb: "/", expression: 1 }
+      ast1("- 1").should eq monad: { lambda: [{ verb: "-" }], expression: 1 }
+      ast1("/1").should eq monad: { lambda: [{ verb: "/" }], expression: 1 }
     end
   end
 

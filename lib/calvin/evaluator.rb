@@ -27,8 +27,8 @@ module Calvin
         AST::Range.new first, second, last
       end
 
-      rule monad: { function: subtree(:function), expression: subtree(:expression) } do |context|
-        function = context[:function]
+      rule monad: { lambda: subtree(:lambda), expression: subtree(:expression) } do |context|
+        function = context[:lambda]
         expression = context[:expression]
 
         function.reverse_each.reduce(expression) do |fold, function|

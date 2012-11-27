@@ -74,7 +74,7 @@ module Calvin
 
     # monad form
     rule :monad do
-      (verb >> spaces? >> adverb.maybe >> spaces? >> word.as(:expression)).as(:monad)
+      (lambda >> spaces? >> word.as(:expression)).as(:monad)
     end
 
     rule :lambda do
