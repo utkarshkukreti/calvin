@@ -8,10 +8,21 @@ describe Calvin::Evaluator do
 
     it "should parse reverse ranges" do
       eval1("5.._5").should eq 5..-5
+      eval1(".._5").should eq 0..-6
+    end
+
+    it "should parse stepped ranges" do
+      eval1("1.3..9").should eq [1, 4, 7]
+      eval1("1.3..7").should eq [1, 4, 7]
+      eval1("1.3..6").should eq [1, 4]
+      eval1("_1.3..6").should eq [-1, 3]
+      eval1("_1.3..7").should eq [-1, 3, 7]
+      eval1("_1._3.._7").should eq [-1, -3, -5, -7]
     end
 
     it "should not parse invalid ranges" do
-      expect { eval1(".._5") }.to raise_exception
+      # Q: Should this raise error or return empty array?
+      eval1("_1.6.._5").should eq []
     end
 
     it "should treat ranges as arrays when required" do

@@ -18,8 +18,12 @@ module Calvin
     rule(:integer) { (str("_").maybe >> digit.repeat(1)).as(:integer) }
     rule(:float) { (str("_").maybe >> digit.repeat(1) >> str(".") >>
                     digit.repeat(1)).as(:float) }
-    rule(:range) { ((integer.maybe.as(:first)) >> str("..") >>
-                    integer.as(:last)).as(:range) }
+    rule(:range) do
+      (
+        (integer.as(:first) >> ((str(".") >> integer.as(:second)).maybe)).maybe >>
+          str("..") >> integer.as(:last)
+      ).as(:range)
+    end
 
     rule(:atom) { (range | float | integer | deassignment).as(:atom) }
 

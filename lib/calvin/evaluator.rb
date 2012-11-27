@@ -15,16 +15,16 @@ module Calvin
         @env[context[:identifier].to_s]
       end
 
+      rule range: { last: simple(:last) } do
+        AST::Range.new 0, last - 1
+      end
+
       rule range: { first: simple(:first), last: simple(:last) } do
-        if first
-          AST::Range.new first, last
-        else
-          if last >= 0
-            AST::Range.new 0, last - 1
-          else
-            raise ArgumentError.new "`last` should be greater than 0 when `first` isn't specified. You passed in #{last}."
-          end
-        end
+        AST::Range.new first, last
+      end
+
+      rule range: { first: simple(:first), second: simple(:second), last: simple(:last) } do
+        AST::Range.new first, second, last
       end
 
       rule monad: { function: subtree(:function), expression: subtree(:expression) } do |context|
