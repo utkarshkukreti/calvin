@@ -3,53 +3,41 @@ module Calvin
     class Range
       include Enumerable
 
-      attr_accessor :first, :second, :last
+      attr_reader :first, :last, :step, :size
 
       def initialize(*numbers)
         if numbers.size == 2
           @first, @last = numbers
+          @step = @first < @last ? 1 : -1
+          @size = 1 + (@last - @first).abs
         elsif numbers.size == 3
-          @first, @second, @last = numbers
+          @first, second, @last = numbers
+          @step = second - @first
+          @size = 1 + (@last - @first) / @step
+          @last = @first + @step * (@size - 1)
         else
           raise Core::ImpossibleException.new "Only 2 or 3 parameters are allowed. You passed in #{numbers.size}."
         end
       end
 
       def each
-        if @second.nil?
-          method = @first > @last ? :downto : :upto
-          @first.send(method, @last) do |i|
-            yield i
-          end
-        else
-          @first.step(@last, @second - @first) do |i|
-            yield i
-          end
+        @first.step(@last, @step) do |i|
+          yield i
         end
       end
 
-      def size
-        1 + ((last - first) / step).abs
-      end
-
-      def step
-        second ? second - first : (first > last ? -1 : 1)
-      end
-
       def ==(other)
-        if @second.nil?
-          other.respond_to?(:first) && other.first == @first &&
-          other.respond_to?(:last) && other.last == @last
+        case other
+        when AST::Range
+          first == other.first && step == other.step &&
+            last == other.last
+        when ::Range
+          (step == 1 || step == -1) && first == other.first &&
+            last == other.last
+        when Array
+          to_a == other
         else
-          case other
-          when Array
-            to_a == other
-          when AST::Range
-            other.first == first && other.step == step &&
-              other.last == last
-          else
-            false
-          end
+          false
         end
       end
 
