@@ -31,7 +31,7 @@ module Calvin
         function = context[:function]
         expression = context[:expression]
 
-        function.reverse.reduce(expression) do |fold, function|
+        function.reverse_each.reduce(expression) do |fold, function|
           apply monad: function.merge(expression: fold)
         end
       end
@@ -129,7 +129,7 @@ module Calvin
             end
           end
         elsif object.respond_to?(:reduce)
-          object.reverse.reduce do |left, right|
+          object.reverse_each.reduce do |left, right|
             apply_dyad fn, right, left
           end
         else

@@ -19,5 +19,9 @@ describe Calvin::Evaluator do
       eval1("..100 - ..100").should eq [0] * 100
       eval1("10.._10 - 20..0").should eq [-10] * 21
     end
+
+    it "should apply adverbs to ranges" do
+      eval1("+\\1..10").should eq 55
+    end
   end
 end
