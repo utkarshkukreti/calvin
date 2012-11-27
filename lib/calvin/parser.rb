@@ -55,17 +55,22 @@ module Calvin
 
     adverb "\\"
 
+    rule :verb do
+      Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
+    end
+
+    rule :adverb do
+      Adverbs.map { |adverb| str adverb[:adverb] }.reduce(:|).as(:adverb)
+    end
+
     # dyad form
     rule :dyad do
-      verbs = Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
-      ((pword | noun).as(:left) >> spaces? >> verbs >> spaces? >> word.as(:right)).as(:dyad)
+      ((pword | noun).as(:left) >> spaces? >> verb >> spaces? >> word.as(:right)).as(:dyad)
     end
 
     # monad form
     rule :monad do
-      adverbs = Adverbs.map { |adverb| str adverb[:adverb] }.reduce(:|).as(:adverb)
-      verbs = Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
-      ((verbs >> spaces? >> adverbs.maybe) >> spaces? >> word.as(:expression)).as(:monad)
+      (verb >> spaces? >> adverb.maybe >> spaces? >> word.as(:expression)).as(:monad)
     end
 
     rule(:word) { dyad | monad | table | list | atom | (pword >> word.maybe).as(:parentheses) }
