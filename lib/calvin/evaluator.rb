@@ -27,6 +27,15 @@ module Calvin
         AST::Range.new first, second, last
       end
 
+      rule monad: { function: subtree(:function),
+                    expression: subtree(:expression) } do |context|
+        old_x = @env["x"]
+        @env["x"] = context[:expression]
+        ret = apply context[:function].get[:lambda]
+        @env["x"] = old_x
+        ret
+      end
+
       rule monad: { lambda: subtree(:lambda), expression: subtree(:expression) } do |context|
         function = context[:lambda]
         expression = context[:expression]
@@ -86,10 +95,19 @@ module Calvin
         end
       end
 
-      rule dyad: subtree(:dyad) do
-        left = dyad[:left]
-        right = dyad[:right]
-        verb = dyad[:verb].to_sym
+      rule dyad: { left: subtree(:left), function: subtree(:function),
+                   right: subtree(:right) } do |context|
+        old_x, old_y = @env["x"], @env["y"]
+        @env["x"] = context[:left]
+        @env["y"] = context[:right]
+        ret = apply context[:function].get[:lambda]
+        @env["x"], @env["y"] = old_x, old_y
+        ret
+      end
+
+      rule dyad: { left: subtree(:left), verb: subtree(:verb),
+                   right: subtree(:right) } do
+        verb = verb().to_sym
 
         case verb
         when :+, :-, :*, :/, :%

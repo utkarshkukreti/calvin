@@ -6,6 +6,7 @@ require "calvin/parser"
 require "calvin/transform"
 
 require "calvin/ast"
+require "calvin/ast/lazy"
 require "calvin/ast/range"
 
 require "calvin/evaluator"

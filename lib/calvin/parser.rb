@@ -69,19 +69,24 @@ module Calvin
 
     # dyad form
     rule :dyad do
-      ((pword | noun).as(:left) >> spaces? >> verb >> spaces? >> word.as(:right)).as(:dyad)
+      ((pword | noun).as(:left) >> spaces? >> (function | verb) >> spaces? >> word.as(:right)).as(:dyad)
     end
 
     # monad form
     rule :monad do
-      (lambda >> spaces? >> word.as(:expression)).as(:monad)
+      ((function | lambda) >> spaces? >> word.as(:expression)).as(:monad)
     end
 
     rule :lambda do
       (verb >> adverb.maybe).repeat(1).as(:lambda)
     end
 
-    rule(:word) { dyad | monad | lambda | table | list | atom | (pword >> word.maybe).as(:parentheses) }
+    # TODO: Choose a better name
+    rule :function do
+      (str("{") >> word.as(:lambda) >> str("}")).as(:function)
+    end
+
+    rule(:word) { dyad | monad | function | lambda | table | list | atom | (pword >> word.maybe).as(:parentheses) }
     rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
     rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
 
