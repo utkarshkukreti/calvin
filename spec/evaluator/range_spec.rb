@@ -12,9 +12,9 @@ describe Calvin::Evaluator do
     end
 
     it "should parse stepped ranges" do
-      eval1("1.3..9").should eq [1, 4, 7]
-      eval1("1.3..7").should eq [1, 4, 7]
-      eval1("1.3..6").should eq [1, 4]
+      eval1("1.4..9").should eq [1, 4, 7]
+      eval1("1.4..7").should eq [1, 4, 7]
+      eval1("1.4..6").should eq [1, 4]
       eval1("_1.3..6").should eq [-1, 3]
       eval1("_1.3..7").should eq [-1, 3, 7]
       eval1("_1._3.._7").should eq [-1, -3, -5, -7]
@@ -33,6 +33,7 @@ describe Calvin::Evaluator do
 
     it "should apply adverbs to ranges" do
       eval1("+\\1..10").should eq 55
+      eval1("+\\_5._4..10").should eq 40
     end
 
     it "should return `.inspect` of `.to_a` on `.inspect`" do

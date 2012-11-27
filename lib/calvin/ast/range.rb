@@ -37,7 +37,7 @@ module Calvin
           other.respond_to?(:first) && other.first == @first &&
           other.respond_to?(:last) && other.last == @last
         else
-          to_a
+          to_a == other
         end
       end
 
