@@ -36,7 +36,7 @@ module Calvin
     rule(:noun) { (table | list | atom).as(:noun) }
 
     # Rank: 0 = atom, 1 = list, 2 = table, ...
-    #                        L, M, R
+    #                L, M, R
     verb :+, ranks: [0, 0, 0]
     verb :-, ranks: [0, 0, 0], space: true
     verb :*, ranks: [0, 0, 0]
