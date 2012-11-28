@@ -17,13 +17,14 @@ module Calvin
       @adverb = adverbs.map { |adverb| str(adverb) }.reduce(:|).as(:adverb)
     end
 
-    rule(:spaces) { str(" ").repeat(1) }
-    rule(:spaces?) { spaces.maybe }
-    rule(:digit) { match["0-9"] }
+    # s = spaces; s? = spaces?
+    rule(:s)       { str(" ").repeat(1) }
+    rule(:s?)      { s.maybe }
+    rule(:digit)   { match["0-9"] }
+    rule(:digits)  { digit.repeat(1) }
 
-    rule(:integer) { (str("_").maybe >> digit.repeat(1)).as(:integer) }
-    rule(:float) { (str("_").maybe >> digit.repeat(1) >> str(".") >>
-                    digit.repeat(1)).as(:float) }
+    rule(:integer) { (str("_").maybe >> digits).as(:integer) }
+    rule(:float)   { (str("_").maybe >> digits >> str(".") >> digits).as(:float) }
     rule(:range) do
       (
         (integer.as(:first) >> ((str(".") >> integer.as(:second)).maybe)).maybe >>
@@ -31,28 +32,26 @@ module Calvin
       ).as(:range)
     end
 
-    rule(:atom) { (range | float | integer | deassignment).as(:atom) }
-
-    rule(:list) { (atom >> (spaces >> atom).repeat(1)).as(:list) }
-
-    rule(:table) { (str("[") >> list >> (str(",") >> spaces? >> list).repeat >>
+    rule(:atom)  { (range | float | integer | deassignment).as(:atom) }
+    rule(:list)  { (atom >> (s >> atom).repeat(1)).as(:list) }
+    rule(:table) { (str("[") >> list >> (str(",") >> s? >> list).repeat >>
                     str("]")).as(:table) }
 
-    rule(:identifier) { match["a-z"].repeat(1).as(:identifier) }
-    rule(:assignment) { (identifier >> spaces? >> str("=") >> spaces? >>
-                         word.as(:expression)).as(:assignment) }
+    rule(:identifier)   { match["a-z"].repeat(1).as(:identifier) }
+    rule(:assignment)   { (identifier >> s? >> str("=") >> s? >>
+                          word.as(:expression)).as(:assignment) }
     rule(:deassignment) { identifier.as(:deassignment) }
 
-    rule(:noun) { (table | list | atom).as(:noun) }
+    rule(:noun)         { (table | list | atom).as(:noun) }
 
     # dyad form
     rule :dyad do
-      ((pword | noun).as(:left) >> spaces? >> (function | verb) >> spaces? >> word.as(:right)).as(:dyad)
+      ((pword | noun).as(:left) >> s? >> (function | verb) >> s? >> word.as(:right)).as(:dyad)
     end
 
     # monad form
     rule :monad do
-      ((function | lambda) >> spaces? >> word.as(:expression)).as(:monad)
+      ((function | lambda) >> s? >> word.as(:expression)).as(:monad)
     end
 
     rule :lambda do
@@ -61,12 +60,12 @@ module Calvin
 
     # TODO: Choose a better name
     rule :function do
-      (str("{") >> word.as(:lambda) >> str("}") >> spaces? >> str("|").as(:filter).maybe).as(:function)
+      (str("{") >> word.as(:lambda) >> str("}") >> s? >> str("|").as(:filter).maybe).as(:function)
     end
 
     rule(:word) { dyad | monad | function | lambda | table | list | atom | (pword >> word.maybe).as(:parentheses) }
-    rule(:pword) { str("(") >> spaces? >> word >> spaces? >> str(")") >> spaces? }
-    rule(:sentence) { spaces? >> (assignment | word.as(:sentence)) >> spaces? }
+    rule(:pword) { str("(") >> s? >> word >> s? >> str(")") >> s? }
+    rule(:sentence) { s? >> (assignment | word.as(:sentence)) >> s? }
 
     rule(:sentences) { sentence.repeat }
 
