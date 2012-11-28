@@ -216,24 +216,36 @@ module Calvin
         elsif fn == :take
           right.take(left)
         else
-          if fn.is_a?(Symbol)
-            sym = fn
-            if Evaluator::Helpers.comparison_function?(sym)
-              fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
-            elsif sym == :min || sym == :max
-              # TODO: Optimize this to _not_ use arrays
-              fn = lambda { |left, right| [left, right].send(sym) }
-            else
-              fn = lambda { |left, right| left.send(sym, right) }
-            end
-          end
-
-          if left.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
-          elsif right.is_a?(Numeric)
-            Evaluator::Helpers.apply lambda { |x| fn.call(x, right) }, left
+          if fn == :* && left.is_a?(AST::Range) && right.is_a?(Integer)
+            first = left.first * right
+            step = left.step * right
+            last = left.last * right
+            AST::Range.new first, first + step, last
+          elsif fn == :* && right.is_a?(AST::Range) && left.is_a?(Integer)
+            first = right.first * left
+            step = right.step * left
+            last = right.last * left
+            AST::Range.new first, first + step, last
           else
-            Evaluator::Helpers.apply_each fn, left, right
+            if fn.is_a?(Symbol)
+              sym = fn
+              if Evaluator::Helpers.comparison_function?(sym)
+                fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
+              elsif sym == :min || sym == :max
+                # TODO: Optimize this to _not_ use arrays
+                fn = lambda { |left, right| [left, right].send(sym) }
+              else
+                fn = lambda { |left, right| left.send(sym, right) }
+              end
+            end
+
+            if left.is_a?(Numeric)
+              Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
+            elsif right.is_a?(Numeric)
+              Evaluator::Helpers.apply lambda { |x| fn.call(x, right) }, left
+            else
+              Evaluator::Helpers.apply_each fn, left, right
+            end
           end
         end
       end

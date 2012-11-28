@@ -47,6 +47,13 @@ describe Calvin::Evaluator do
       eval1("-\\_10..38").should eq 14
     end
 
+    it "should multiply ranges with integers" do
+      eval1("2 * ..5").should eq [0, 2, 4, 6, 8]
+      eval1("2 * _2..2").should eq [-4, -2, 0, 2, 4]
+      eval1("..5 * 2").should eq [0, 2, 4, 6, 8]
+      eval1("_2..2 * 2").should eq [-4, -2, 0, 2, 4]
+    end
+
     it "should return `.inspect` of `.to_a` on `.inspect`" do
       eval1("1._4.._10").inspect.should eq [1, -4, -9].inspect
     end

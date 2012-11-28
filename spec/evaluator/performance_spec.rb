@@ -17,5 +17,10 @@ describe Calvin::Evaluator do
       eval1("10>:..#{Zillion}").should eq [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
       eval1("4>:_100..#{Zillion}").should eq [-100, -99, -98, -97]
     end
+
+    it "should optimize multiplying range with a number" do
+      eval1("4>:2*..#{Zillion}").should eq [0, 2, 4, 6]
+      eval1("4>:..#{Zillion}*2").should eq [0, 2, 4, 6]
+    end
   end
 end
