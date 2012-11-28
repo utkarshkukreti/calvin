@@ -78,6 +78,10 @@ module Calvin
               Evaluator::Helpers.foldr :"!=", expression
             when :<, :<=, :>, :>=
               Evaluator::Helpers.foldr verb, expression
+            when :&
+              Evaluator::Helpers.foldr :min, expression
+            when :|
+              Evaluator::Helpers.foldr :max, expression
             end
           else
             raise Core::ImpossibleException.new "Invalid adverb in monad #{monad.inspect}."
@@ -138,9 +142,9 @@ module Calvin
         when :<, :<=, :>, :>=
           Evaluator::Helpers.apply_dyad verb, left, right
         when :|
-          Evaluator::Helpers.apply_dyad :|, left, right
+          Evaluator::Helpers.apply_dyad :max, left, right
         when :&
-          Evaluator::Helpers.apply_dyad :&, left, right
+          Evaluator::Helpers.apply_dyad :min, left, right
         end
       end
     end
@@ -193,6 +197,9 @@ module Calvin
           sym = fn
           if Evaluator::Helpers.comparison_function?(sym)
             fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
+          elsif sym == :min || sym == :max
+            # TODO: Optimize this to _not_ use arrays
+            fn = lambda { |left, right| [left, right].send(sym) }
           else
             fn = lambda { |left, right| left.send(sym, right) }
           end
@@ -234,7 +241,7 @@ module Calvin
       end
 
       def comparison_function?(fn)
-        %w{== <> > >= < <= !=}.include?(fn.to_s)
+        %w{== <> > >= < <= != || &&}.include?(fn.to_s)
       end
     end
   end
