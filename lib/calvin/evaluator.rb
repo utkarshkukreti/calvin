@@ -2,6 +2,12 @@ module Calvin
   class Evaluator < Parslet::Transform
     attr_accessor :env
 
+    def evaluate(input)
+      preparsed = PreParser.new.parse(input)
+      ast = AST.new.parse(input)
+      apply ast
+    end
+
     def initialize
       super
       @env = {}

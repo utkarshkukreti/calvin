@@ -46,8 +46,10 @@ module Calvin
         begin
           next if line == ""
 
-          ast = AST.new.parse(line)
+          preparsed = PreParser.new.parse(line)
+          ast = AST.new.parse(preparsed)
 
+          log "Preparsed: #{preparsed}"
           log "      AST: #{ast.inspect}"
           log "Evaluated: "
 

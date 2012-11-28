@@ -9,8 +9,8 @@ module Calvin
     end
 
     def eval1(input)
-      ast = ast1(input)
-      Evaluator.new.apply ast
+      e = Evaluator.new
+      e.evaluate(input)[0]
     end
 
     def preparse(input)
