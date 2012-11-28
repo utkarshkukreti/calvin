@@ -49,7 +49,7 @@ module Calvin
 
         filtered = apply context[:lambda]
         expression.select.with_index do |el, index|
-          filtered[index]
+          filtered[index] == 1
         end
       end
 
@@ -158,13 +158,14 @@ module Calvin
       end
 
       def foldr(fn, object)
-        comparison = %w{== <> > >= < <=}.include?(fn.to_s)
-        if comparison
+        if Evaluator::Helpers.comparison_function?(fn)
           if !object.respond_to?(:reduce)
-            0.send(fn, object)
+            0.send(fn, object) ? 1 : 0
           else
             object.each_cons(2).reduce do |fold, (left, right)|
-              fold && left.send(fn, right)
+              # FIXME: This is probably not a good idea
+              # fold is an array of 2 elements on first run, and integer after that
+              (fold && left.send(fn, right)) ? 1 : 0
             end
           end
         elsif object.respond_to?(:reduce)
@@ -190,7 +191,11 @@ module Calvin
       def apply_dyad(fn, left, right)
         if fn.is_a?(Symbol)
           sym = fn
-          fn = lambda { |left, right| left.send(sym, right) }
+          if Evaluator::Helpers.comparison_function?(sym)
+            fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
+          else
+            fn = lambda { |left, right| left.send(sym, right) }
+          end
         end
 
         if left.is_a?(Numeric)
@@ -222,12 +227,14 @@ module Calvin
           left.map do |l|
             fn.call l, right
           end
-        elsif (left == true || left == false) && (right == true || right == false)
-          fn.call left, right
         else
           # Raise error: Structure doesn't match
           raise ArgumentError.new "Structure doesn't match. `left`'s class is #{left.class}, while `right`'s is #{right.class}."
         end
+      end
+
+      def comparison_function?(fn)
+        %w{== <> > >= < <= !=}.include?(fn.to_s)
       end
     end
   end

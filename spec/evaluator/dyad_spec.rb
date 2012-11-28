@@ -43,29 +43,29 @@ describe Calvin::Evaluator do
     end
 
     it "should evaluate equals(`=`) dyad" do
-      eval1("1 = 0 1 1 0").should eq [false, true, true, false]
-      eval1("0 1 1 0 = 0").should eq [true, false, false, true]
-      eval1("0 _1 1 = _1").should eq [false, true, false]
+      eval1("1 = 0 1 1 0").should eq [0, 1, 1, 0]
+      eval1("0 1 1 0 = 0").should eq [1, 0, 0, 1]
+      eval1("0 _1 1 = _1").should eq [0, 1, 0]
     end
 
     it "should evaluate not equals(`<>`) dyad" do
-      eval1("1 <> 2 2 1").should eq [true, true, false]
+      eval1("1 <> 2 2 1").should eq [1, 1, 0]
     end
 
     it "should evaluate less than(`<`) dyad" do
-      eval1("1 < 1 2 4").should eq [false, true, true]
+      eval1("1 < 1 2 4").should eq [0, 1, 1]
     end
 
     it "should evaluate less than or equal to(`<=`) dyad" do
-      eval1("1 <= 1 2 3").should eq [true, true, true]
+      eval1("1 <= 1 2 3").should eq [1, 1, 1]
     end
 
     it "should evaluate greater than(`>`) dyad" do
-      eval1("1 > 2 1 4").should eq [false, false, false]
+      eval1("1 > 2 1 4").should eq [0, 0, 0]
     end
 
     it "should evaluate greater than or equal to(`>=`) dyad" do
-      eval1("1 >= 1 2 4").should eq [true, false, false]
+      eval1("1 >= 1 2 4").should eq [1, 0, 0]
     end
   end
 
@@ -101,29 +101,29 @@ describe Calvin::Evaluator do
     end
 
     it "should evaluate equals(`=`) dyad" do
-      eval1("1 1 1 1 = 0 1 1 0").should eq [false, true, true, false]
-      eval1("0 1 1 0 = 0 1 0 0").should eq [true, true, false, true]
-      eval1("0 _1 1 = _1 0 1").should eq [false, false, true]
+      eval1("1 1 1 1 = 0 1 1 0").should eq [0, 1, 1, 0]
+      eval1("0 1 1 0 = 0 1 0 0").should eq [1, 1, 0, 1]
+      eval1("0 _1 1 = _1 0 1").should eq [0, 0, 1]
     end
 
     it "should evaluate not equals(`<>`) dyad" do
-      eval1("1 2 1 <> 2 2 1").should eq [true, false, false]
+      eval1("1 2 1 <> 2 2 1").should eq [1, 0, 0]
     end
 
     it "should evaluate less than(`<`) dyad" do
-      eval1("1 2 3 < 1 2 4").should eq [false, false, true]
+      eval1("1 2 3 < 1 2 4").should eq [0, 0, 1]
     end
 
     it "should evaluate less than or equal to(`<=`) dyad" do
-      eval1("1 2 3 <= 1 2 3").should eq [true, true, true]
+      eval1("1 2 3 <= 1 2 3").should eq [1, 1, 1]
     end
 
     it "should evaluate greater than(`>`) dyad" do
-      eval1("1 2 3 > 2 1 4").should eq [false, true, false]
+      eval1("1 2 3 > 2 1 4").should eq [0, 1, 0]
     end
 
     it "should evaluate greater than or equal to(`>=`) dyad" do
-      eval1("1 2 3 >= 1 2 4").should eq [true, true, false]
+      eval1("1 2 3 >= 1 2 4").should eq [1, 1, 0]
     end
 
     it "should apply single verb to a list if possible" do
@@ -132,18 +132,18 @@ describe Calvin::Evaluator do
     end
 
     it "should evaluate or(`|`) dyad on booleans" do
-      eval1("(2=2)|3=1").should eq true
-      eval1("(5>9)|8>9").should eq false
+      eval1("(2=2)|3=1").should eq 1
+      eval1("(5>9)|8>9").should eq 0
     end
 
     it "should evaluate and(`&`) dyad on booleans" do
-      eval1("(2>3)&4>3").should eq false
-      eval1("(1<=2)&6<=7").should eq true
+      eval1("(2>3)&4>3").should eq 0
+      eval1("(1<=2)&6<=7").should eq 1
     end
 
     it "should evaluate or(`|`) and and(`&`) chained dyad" do
-      eval1("((2+3)>3)&(4<7+8)&1<0").should eq false
-      eval1("((2+3)>3)|(4<7+8)&1<0").should eq true
+      eval1("((2+3)>3)&(4<7+8)&1<0").should eq 0
+      eval1("((2+3)>3)|(4<7+8)&1<0").should eq 1
     end
   end
 
