@@ -1,14 +1,20 @@
 module Calvin
   class Parser < Parslet::Parser
-    Verbs = []
-    Adverbs = []
+    attr_reader :verbs, :adverbs, :verb, :adverb
 
-    def self.verb(verb, options = {})
-      Verbs << options.merge(verb: verb)
+    def initialize
+      self.verbs = %w{+ - * / ^ % & <: >: = <> <= < >= > # | &}
+      self.adverbs = %w{\\}
     end
 
-    def self.adverb(adverb, options = {})
-      Adverbs << options.merge(adverb: adverb)
+    def verbs=(verbs)
+      @verbs = verbs
+      @verb = verbs.map { |verb| str(verb) }.reduce(:|).as(:verb)
+    end
+
+    def adverbs=(adverbs)
+      @adverbs = adverbs
+      @adverb = adverbs.map { |adverb| str(adverb) }.reduce(:|).as(:adverb)
     end
 
     rule(:spaces) { str(" ").repeat(1) }
@@ -38,40 +44,6 @@ module Calvin
     rule(:deassignment) { identifier.as(:deassignment) }
 
     rule(:noun) { (table | list | atom).as(:noun) }
-
-    # Rank: 0 = atom, 1 = list, 2 = table, ...
-    #                L, M, R
-    verb :+, ranks: [0, 0, 0]
-    verb :-, ranks: [0, 0, 0], space: true
-    verb :*, ranks: [0, 0, 0]
-    verb :/, ranks: [0, 0, 0]
-    verb :^, ranks: [0, 0, 0]
-    verb :%, ranks: [0, 0, 0]
-
-    verb "<:" # Dyadic Drop
-    verb ">:" # Dyadic Take
-
-    verb "="
-    verb "<>"
-    verb :<=
-    verb :<
-    verb :>=
-    verb :>
-
-    verb "#"
-
-    verb :|
-    verb :&
-
-    adverb "\\"
-
-    rule :verb do
-      Verbs.map { |verb| str verb[:verb] }.reduce(:|).as(:verb)
-    end
-
-    rule :adverb do
-      Adverbs.map { |adverb| str adverb[:adverb] }.reduce(:|).as(:adverb)
-    end
 
     # dyad form
     rule :dyad do
