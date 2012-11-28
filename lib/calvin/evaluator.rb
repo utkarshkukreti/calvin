@@ -120,6 +120,10 @@ module Calvin
           Evaluator::Helpers.apply_dyad :"!=", left, right
         when :<, :<=, :>, :>=
           Evaluator::Helpers.apply_dyad verb, left, right
+        when :|
+          Evaluator::Helpers.apply_dyad :|, left, right
+        when :&
+          Evaluator::Helpers.apply_dyad :&, left, right
         end
       end
     end
@@ -201,6 +205,8 @@ module Calvin
           left.map do |l|
             fn.call l, right
           end
+        elsif (left == true || left == false) && (right == true || right == false)
+          fn.call left, right
         else
           # Raise error: Structure doesn't match
           raise ArgumentError.new "Structure doesn't match. `left`'s class is #{left.class}, while `right`'s is #{right.class}."

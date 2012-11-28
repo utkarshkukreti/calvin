@@ -57,6 +57,9 @@ module Calvin
 
     verb "#"
 
+    verb :|
+    verb :&
+
     adverb "\\"
 
     rule :verb do

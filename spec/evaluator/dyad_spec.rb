@@ -130,6 +130,21 @@ describe Calvin::Evaluator do
       eval1("1 2 * [6 7, 8 9]").should eq [[6, 7], [16, 18]]
       eval1("[6 7, 8 9] % 3 2").should eq [[0, 1], [0, 1]]
     end
+
+    it "should evaluate or(`|`) dyad on booleans" do
+      eval1("(2=2)|3=1").should eq true
+      eval1("(5>9)|8>9").should eq false
+    end
+
+    it "should evaluate and(`&`) dyad on booleans" do
+      eval1("(2>3)&4>3").should eq false
+      eval1("(1<=2)&6<=7").should eq true
+    end
+
+    it "should evaluate or(`|`) and and(`&`) chained dyad" do
+      eval1("((2+3)>3)&(4<7+8)&1<0").should eq false
+      eval1("((2+3)>3)|(4<7+8)&1<0").should eq true
+    end
   end
 
 
