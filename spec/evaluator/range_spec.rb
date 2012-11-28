@@ -35,6 +35,16 @@ describe Calvin::Evaluator do
       eval1("+\\1..10").should eq 55
       eval1("+\\1.4..9").should eq 12
       eval1("+\\_5._4..10").should eq 40
+
+      eval1("*\\1..10").should eq 3628800
+      eval1("*\\_1..10").should eq 0
+      eval1("*\\_10.._1").should eq 3628800
+      eval1("*\\_10.._2").should eq -3628800
+
+      eval1("-\\1..100").should eq -50
+      eval1("-\\_10..40").should eq 15
+      eval1("-\\_10..39").should eq -25
+      eval1("-\\_10..38").should eq 14
     end
 
     it "should return `.inspect` of `.to_a` on `.inspect`" do

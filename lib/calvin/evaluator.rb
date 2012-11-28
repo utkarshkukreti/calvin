@@ -191,6 +191,14 @@ module Calvin
             case fn
             when :+
               (size  * (2 * first + (size - 1) * step)) / 2
+            when :*
+              object.reduce(:*)
+            when :-
+              # TODO: Maybe make this more efficient?
+              # I don't see any practical use cases of this though.
+              object.reverse_each.reduce do |fold, el|
+                el - fold
+              end
             end
           else
             object.reverse_each.reduce do |left, right|
