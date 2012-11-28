@@ -67,6 +67,18 @@ describe Calvin::Evaluator do
     it "should evaluate greater than or equal to(`>=`) dyad" do
       eval1("1 >= 1 2 4").should eq [1, 0, 0]
     end
+
+    it "should evaluate drop(`<:`) dyad" do
+      eval1("2<:6 7 8").should eq [8]
+      eval1("5<:..10").should eq [5, 6, 7, 8, 9]
+      eval1("5<:_1..10").should eq [4, 5, 6, 7, 8, 9, 10]
+    end
+
+    it "should evaluate take(`>:`) dyad" do
+      eval1("2>:6 7 8").should eq [6, 7]
+      eval1("5>:..10").should eq [0, 1, 2, 3, 4]
+      eval1("5>:_1..10").should eq [-1, 0, 1, 2, 3]
+    end
   end
 
   describe "should evaluate dyads with 2 arrays" do

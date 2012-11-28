@@ -145,6 +145,10 @@ module Calvin
           Evaluator::Helpers.apply_dyad :max, left, right
         when :&
           Evaluator::Helpers.apply_dyad :min, left, right
+        when :"<:"
+          Evaluator::Helpers.apply_dyad :drop, left, right
+        when :">:"
+          Evaluator::Helpers.apply_dyad :take, left, right
         end
       end
     end
@@ -193,24 +197,30 @@ module Calvin
       end
 
       def apply_dyad(fn, left, right)
-        if fn.is_a?(Symbol)
-          sym = fn
-          if Evaluator::Helpers.comparison_function?(sym)
-            fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
-          elsif sym == :min || sym == :max
-            # TODO: Optimize this to _not_ use arrays
-            fn = lambda { |left, right| [left, right].send(sym) }
-          else
-            fn = lambda { |left, right| left.send(sym, right) }
-          end
-        end
-
-        if left.is_a?(Numeric)
-          Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
-        elsif right.is_a?(Numeric)
-          Evaluator::Helpers.apply lambda { |x| fn.call(x, right) }, left
+        if fn == :drop
+          right.drop(left)
+        elsif fn == :take
+          right.take(left)
         else
-          Evaluator::Helpers.apply_each fn, left, right
+          if fn.is_a?(Symbol)
+            sym = fn
+            if Evaluator::Helpers.comparison_function?(sym)
+              fn = lambda { |left, right| left.send(sym, right) ? 1 : 0 }
+            elsif sym == :min || sym == :max
+              # TODO: Optimize this to _not_ use arrays
+              fn = lambda { |left, right| [left, right].send(sym) }
+            else
+              fn = lambda { |left, right| left.send(sym, right) }
+            end
+          end
+
+          if left.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| fn.call(left,  x) }, right
+          elsif right.is_a?(Numeric)
+            Evaluator::Helpers.apply lambda { |x| fn.call(x, right) }, left
+          else
+            Evaluator::Helpers.apply_each fn, left, right
+          end
         end
       end
 

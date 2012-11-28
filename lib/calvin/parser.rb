@@ -48,6 +48,9 @@ module Calvin
     verb :^, ranks: [0, 0, 0]
     verb :%, ranks: [0, 0, 0]
 
+    verb "<:" # Dyadic Drop
+    verb ">:" # Dyadic Take
+
     verb "="
     verb "<>"
     verb :<=
