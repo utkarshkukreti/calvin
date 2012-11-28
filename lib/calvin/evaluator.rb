@@ -31,9 +31,26 @@ module Calvin
                     expression: subtree(:expression) } do |context|
         old_x = @env["x"]
         @env["x"] = context[:expression]
-        ret = apply context[:function].get[:lambda]
+        function = context[:function].get
+        if function[:filter]
+          ret = apply filter: function
+        else
+          ret = apply function[:lambda]
+        end
         @env["x"] = old_x
         ret
+      end
+
+      rule filter: { lambda: subtree(:lambda), filter: simple(:filter) } do |context|
+        expression = @env["x"]
+        if !expression.is_a?(Array) && !expression.is_a?(AST::Range)
+          raise NotImplementError.new "You can only filter Arrays or Ranges. You passed a #{expression.class}."
+        end
+
+        filtered = apply context[:lambda]
+        expression.select.with_index do |el, index|
+          filtered[index]
+        end
       end
 
       rule monad: { lambda: subtree(:lambda), expression: subtree(:expression) } do |context|

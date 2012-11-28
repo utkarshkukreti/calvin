@@ -86,7 +86,7 @@ module Calvin
 
     # TODO: Choose a better name
     rule :function do
-      (str("{") >> word.as(:lambda) >> str("}")).as(:function)
+      (str("{") >> word.as(:lambda) >> str("}") >> spaces? >> str("|").as(:filter).maybe).as(:function)
     end
 
     rule(:word) { dyad | monad | function | lambda | table | list | atom | (pword >> word.maybe).as(:parentheses) }
