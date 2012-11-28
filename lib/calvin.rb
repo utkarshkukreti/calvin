@@ -2,6 +2,8 @@ require "parslet"
 require "docopt"
 
 require "calvin/core"
+
+require "calvin/preparser"
 require "calvin/parser"
 require "calvin/transform"
 

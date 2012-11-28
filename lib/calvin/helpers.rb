@@ -12,5 +12,9 @@ module Calvin
       ast = ast1(input)
       Evaluator.new.apply ast
     end
+
+    def preparse(input)
+      PreParser.new.parse input
+    end
   end
 end
